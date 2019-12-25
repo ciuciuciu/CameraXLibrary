@@ -1,0 +1,2 @@
+include ':app', /*':cameralibrary',*/ ':camerax'
+rootProject.name='CameraPreview'
