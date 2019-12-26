@@ -3,14 +3,12 @@ package com.ciuciu.camerax.ui.viewer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
 import com.ciuciu.camerax.R;
+import com.ciuciu.camerax.utils.ImageLoader;
 
 import java.io.File;
 
@@ -28,10 +26,10 @@ public class PhotoViewerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_viewer);
         Intent intent = getIntent();
+
         File photoFile = (File) intent.getSerializableExtra(INTENT_KEY_PHOTO_FILE);
         if (photoFile != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getPath());
-            ((ImageView) findViewById(R.id.imageView)).setImageBitmap(bitmap);
+            ImageLoader.loadImage(findViewById(R.id.imageView), photoFile);
         }
     }
 }

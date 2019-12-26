@@ -58,6 +58,6 @@ public class CaptureControllerView extends BaseControllerView {
         int padding = (int) getResources().getDimension(R.dimen.stroke_small);
         btnViewPhoto.setPadding(padding, padding, padding, padding);
         // Load thumbnail into circular button using Glide
-        ImageLoader.loadImage(btnViewPhoto, file);
+        ImageLoader.loadCircleImage(btnViewPhoto, file);
     }
 }

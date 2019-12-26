@@ -12,6 +12,12 @@ public class ImageLoader {
     public static void loadImage(ImageView imageView, File imageFile) {
         Glide.with(imageView)
                 .load(imageFile)
+                .into(imageView);
+    }
+
+    public static void loadCircleImage(ImageView imageView, File imageFile) {
+        Glide.with(imageView)
+                .load(imageFile)
                 .apply(RequestOptions.circleCropTransform())
                 .into(imageView);
     }
