@@ -1,18 +1,14 @@
 package com.ciuciu.camerax.ui;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +25,7 @@ import com.ciuciu.camerax.overlaycontroller.BaseControllerView;
 import com.ciuciu.camerax.overlaycontroller.CameraControllerListener;
 import com.ciuciu.camerax.overlaycontroller.CaptureControllerView;
 import com.ciuciu.camerax.preview.CameraPreview;
+import com.ciuciu.camerax.ui.viewer.PhotoViewerActivity;
 import com.ciuciu.camerax.utils.FileUtils;
 
 import java.io.File;
@@ -36,20 +33,13 @@ import java.io.File;
 public class CameraFragment extends BaseCameraFragment implements CameraControllerListener, CameraManagerListener {
 
     private final String TAG = CameraFragment.class.getSimpleName();
-    /**
-     * Milliseconds used for UI animations
-     */
-    private final long ANIMATION_FAST_MILLIS = 50L;
-    private final long ANIMATION_SLOW_MILLIS = 100L;
 
     private CameraPreview mCameraPreview;
     private CaptureControllerView mControllerView;
 
-    private RelativeLayout resultContainer;
-    private ImageView imageResult;
-    private Button btnClose;
-
     private CameraManager mCameraManager;
+
+    private File mLastCaptureFile;
 
     public static Fragment newInstance() {
         return new CameraFragment();
@@ -60,24 +50,12 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_camera_x, container, false);
-
-        resultContainer = rootView.findViewById(R.id.resultContainer);
-        imageResult = rootView.findViewById(R.id.imageView);
-        btnClose = rootView.findViewById(R.id.btnClose);
-
         return rootView;
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        mCameraManager.onAttach(mCameraPreview.getTextureView().getDisplay());
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroyView() {
+        super.onDestroyView();
         mCameraManager.onDetach();
     }
 
@@ -97,22 +75,22 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
             return;
         }
 
-        mCameraPreview.post(new Runnable() {
+        TextureView textureView = mCameraPreview.getTextureView();
+        textureView.post(new Runnable() {
             @Override
             public void run() {
                 CameraX.unbindAll();
 
-                int rotation = mCameraPreview.getTextureView().getDisplay().getRotation();
-
                 // generate preview config
-                Preview preview = mCameraManager.generatePreviewConfig(rotation);
-
+                Preview preview = mCameraManager.generatePreviewConfig(textureView.getDisplay().getRotation());
                 mCameraPreview.setPreview(preview);
                 mCameraPreview.setOverlayView(createOverlayView());
 
                 // generate capture config
-                ImageCapture imageCapture = mCameraManager.generateCaptureConfig(rotation);
+                ImageCapture imageCapture = mCameraManager.generateCaptureConfig(textureView.getDisplay().getRotation());
 
+                // Attach to manager and bind to lifecycle
+                mCameraManager.onAttach(mCameraPreview.getTextureView());
                 CameraX.bindToLifecycle(CameraFragment.this, preview, imageCapture);
             }
         });
@@ -165,26 +143,19 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
 
     @Override
     public void openImageGallery() {
-
+        if (mLastCaptureFile != null) {
+            PhotoViewerActivity.startActivity(getContext(), mLastCaptureFile);
+        }
     }
 
     @Override
     public void onCapturePhotoSuccess(@NonNull File photoFile) {
+        mLastCaptureFile = photoFile;
+
         // Update the gallery thumbnail with latest picture taken
         if (mControllerView != null) {
-            //mControllerView.setGalleryThumbnail(photoFile);
+            mControllerView.setGalleryThumbnail(photoFile);
         }
-
-        resultContainer.setVisibility(View.VISIBLE);
-        Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getPath());
-        imageResult.setImageBitmap(bitmap);
-
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                resultContainer.setVisibility(View.GONE);
-            }
-        });
     }
 
     @Override

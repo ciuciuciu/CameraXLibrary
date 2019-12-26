@@ -28,7 +28,6 @@ public class CameraPreview extends RelativeLayout {
     private @CameraScale.ScaleType
     int mCameraScaleType = CameraScale.SCALE_TYPE_CENTER_CROP;
 
-
     public CameraPreview(Context context) {
         super(context);
         init();
@@ -53,7 +52,7 @@ public class CameraPreview extends RelativeLayout {
         mOverlayContainer = findViewById(R.id.overlayContainer);
     }
 
-    public TextureView getTextureView() {
+    public TextureView getTextureView(){
         return mTextureView;
     }
 

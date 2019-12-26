@@ -1,12 +1,12 @@
 package com.ciuciu.camerax.camera;
 
-import android.view.Display;
+import android.view.TextureView;
 
 public interface CameraManagerView {
 
     void setListener(CameraManagerListener listener);
 
-    void onAttach(Display display);
+    void onAttach(TextureView textureView);
 
     void onDetach();
 }

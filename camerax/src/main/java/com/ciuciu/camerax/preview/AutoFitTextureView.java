@@ -14,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.camera.core.Preview;
 
 import com.ciuciu.camerax.CameraHelper;
-import com.ciuciu.camerax.utils.ScreenUtils;
 
 class AutoFitTextureView extends TextureView {
 
@@ -154,7 +153,13 @@ class AutoFitTextureView extends TextureView {
         if (previewSource != null) {
             mPreviewSourceRotation = previewSource.getRotationDegrees();
         }
-        int newTextureViewRotation = CameraHelper.getDisplaySurfaceRotation(getDisplay());
+        int newTextureViewRotation;
+        if(getDisplay() != null){
+            newTextureViewRotation = CameraHelper.getDisplaySurfaceRotation(getDisplay());
+        }else {
+            newTextureViewRotation = mCurrentRotation;
+        }
+
 
         if (newTextureViewRotation == mCurrentRotation && newPreviewSourceSize == mPreviewSourceSize && newTextureViewSize == mCurrentSize) {
             // Nothing has changed, no need to transform output again

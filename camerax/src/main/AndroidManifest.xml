@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ciuciu.camerax" >
+    package="com.ciuciu.camerax">
+
+    <uses-feature android:name="android.hardware.camera" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -7,6 +9,7 @@
 
     <application android:requestLegacyExternalStorage="true">
 
+        <activity android:name=".ui.viewer.PhotoViewerActivity" />
     </application>
 
 </manifest>

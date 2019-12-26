@@ -3,7 +3,7 @@ package com.ciuciu.camerax.camera;
 import android.content.Context;
 import android.hardware.display.DisplayManager;
 import android.util.Log;
-import android.view.Display;
+import android.view.TextureView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,9 +29,9 @@ public class CameraManager implements CameraManagerView {
     private Executor mainExecutor;
     private CameraManagerListener mCameraManagerListener;
 
-    private DisplayManager displayManager;
-    private Display mAttachedDisplay;
-    private int displayId = -1;
+    private DisplayManager mDisplayManager;
+    private int mTextureDisplayId = -1;
+    private TextureView mAttachedTextureView;
 
     private DisplayManager.DisplayListener displayListener = new DisplayManager.DisplayListener() {
         @Override
@@ -46,23 +46,25 @@ public class CameraManager implements CameraManagerView {
 
         @Override
         public void onDisplayChanged(int displayId) {
-            if (displayId == CameraManager.this.displayId) {
-                Log.d(TAG, "Rotation changed: ${view.display.rotation}");
-                if (mPreview != null && mAttachedDisplay != null) {
-                    mPreview.setTargetRotation(mAttachedDisplay.getRotation());
+            if (displayId == CameraManager.this.mTextureDisplayId) {
+                Log.d(TAG, "Rotation changed: " + displayId);
+                if (mPreview != null && mAttachedTextureView != null && mAttachedTextureView.getDisplay() != null) {
+                    Log.d(TAG, "Set new rotation " + mAttachedTextureView.getDisplay().getRotation() + " for Preview");
+                    mPreview.setTargetRotation(mAttachedTextureView.getDisplay().getRotation());
                 }
-//                imageCapture?.setTargetRotation(view.display.rotation);
-//                imageAnalyzer?.setTargetRotation(view.display.rotation);
+
+                if (mImageCapture != null && mAttachedTextureView != null && mAttachedTextureView.getDisplay() != null) {
+                    Log.d(TAG, "Set new rotation " + mAttachedTextureView.getDisplay().getRotation() + " for ImageCapture");
+                    mImageCapture.setTargetRotation(mAttachedTextureView.getDisplay().getRotation());
+                }
+                //imageAnalyzer?.setTargetRotation(view.display.rotation);
             }
         }
     };
 
     public CameraManager(Context context) {
         mCameraConfig = new CameraConfig();
-
         mainExecutor = ContextCompat.getMainExecutor(context);
-        displayManager = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
-
     }
 
     @Override
@@ -71,14 +73,16 @@ public class CameraManager implements CameraManagerView {
     }
 
     @Override
-    public void onAttach(Display attachedDisplay) {
-        mAttachedDisplay = attachedDisplay;
-        displayManager.registerDisplayListener(displayListener, null);
+    public void onAttach(@NonNull TextureView textureView) {
+        mTextureDisplayId = textureView.getDisplay().getDisplayId();
+        mAttachedTextureView = textureView;
+        mDisplayManager = (DisplayManager) textureView.getContext().getSystemService(Context.DISPLAY_SERVICE);
+        mDisplayManager.registerDisplayListener(displayListener, null);
     }
 
     @Override
     public void onDetach() {
-        displayManager.unregisterDisplayListener(displayListener);
+        mDisplayManager.unregisterDisplayListener(displayListener);
     }
 
     public CameraConfig getCameraConfig() {
@@ -110,8 +114,6 @@ public class CameraManager implements CameraManagerView {
         mImageCapture = new ImageCapture(captureConfig);
         return mImageCapture;
     }
-
-
 
 
     public void capturePhoto(File targetFile) {

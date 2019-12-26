@@ -14,6 +14,12 @@ import com.ciuciu.camerax.overlaycontroller.BaseControllerView;
 
 public abstract class BaseCameraFragment extends Fragment {
 
+    /**
+     * Milliseconds used for UI animations
+     */
+    public final long ANIMATION_FAST_MILLIS = 50L;
+    public final long ANIMATION_SLOW_MILLIS = 100L;
+
     private final String TAG = BaseCameraFragment.class.getSimpleName();
 
     @Override
