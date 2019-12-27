@@ -3,6 +3,7 @@ package com.ciuciu.camerax.camera;
 import android.content.Context;
 import android.hardware.display.DisplayManager;
 import android.util.Log;
+import android.util.Size;
 import android.view.TextureView;
 
 import androidx.annotation.NonNull;
@@ -14,24 +15,28 @@ import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
 import androidx.core.content.ContextCompat;
 
+import com.ciuciu.camerax.camera.config.CameraConfig;
+
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 public class CameraManager implements CameraManagerView {
 
     private final String TAG = CameraManager.class.getSimpleName();
 
-    private CameraConfig mCameraConfig;
+    private Context mContext;
+    private DisplayManager mDisplayManager;
+    private Executor mainExecutor;
+    private CameraManagerListener mCameraManagerListener;
 
     private Preview mPreview;
     private ImageCapture mImageCapture;
 
-    private Executor mainExecutor;
-    private CameraManagerListener mCameraManagerListener;
+    private CameraConfig mCameraConfig;
 
-    private DisplayManager mDisplayManager;
-    private int mTextureDisplayId = -1;
     private TextureView mAttachedTextureView;
+    private int mTextureDisplayId = -1;
 
     private DisplayManager.DisplayListener displayListener = new DisplayManager.DisplayListener() {
         @Override
@@ -63,7 +68,8 @@ public class CameraManager implements CameraManagerView {
     };
 
     public CameraManager(Context context) {
-        mCameraConfig = new CameraConfig();
+        mContext = context;
+        mCameraConfig = new CameraConfig(mContext);
         mainExecutor = ContextCompat.getMainExecutor(context);
     }
 
@@ -85,34 +91,80 @@ public class CameraManager implements CameraManagerView {
         mDisplayManager.unregisterDisplayListener(displayListener);
     }
 
-    public CameraConfig getCameraConfig() {
-        if (mCameraConfig == null) {
-            mCameraConfig = new CameraConfig();
-        }
-        return mCameraConfig;
-    }
-
     public Preview generatePreviewConfig(int rotation) {
-        PreviewConfig previewConfig = new PreviewConfig.Builder()
-                .setLensFacing(mCameraConfig.getLensFacing())
-                .setTargetAspectRatio(mCameraConfig.getAspectRatio())
-                .setTargetRotation(rotation)
-                .build();
+        Size targetResolution = mCameraConfig.getTargetResolution(rotation);
+
+        PreviewConfig previewConfig;
+        if (targetResolution == null) {
+            previewConfig = new PreviewConfig.Builder()
+                    .setLensFacing(mCameraConfig.getLensFacing())
+                    .setTargetAspectRatio(mCameraConfig.getAspectRatio())
+                    .setTargetRotation(rotation)
+                    .build();
+
+        } else {
+            previewConfig = new PreviewConfig.Builder()
+                    .setLensFacing(mCameraConfig.getLensFacing())
+                    .setTargetResolution(targetResolution)
+                    .setTargetRotation(rotation)
+                    .build();
+        }
 
         mPreview = new Preview(previewConfig);
         return mPreview;
     }
 
     public ImageCapture generateCaptureConfig(int rotation) {
-        ImageCaptureConfig captureConfig = new ImageCaptureConfig.Builder()
-                .setLensFacing(mCameraConfig.getLensFacing())
-                .setTargetAspectRatio(mCameraConfig.getAspectRatio())
-                .setTargetRotation(rotation)
-                .setCaptureMode(ImageCapture.CaptureMode.MAX_QUALITY)
-                .build();
+        Size targetResolution = mCameraConfig.getTargetResolution(rotation);
+
+        ImageCaptureConfig captureConfig;
+        if (targetResolution == null) {
+            captureConfig = new ImageCaptureConfig.Builder()
+                    .setLensFacing(mCameraConfig.getLensFacing())
+                    .setTargetAspectRatio(mCameraConfig.getAspectRatio())
+                    .setTargetRotation(rotation)
+                    .setCaptureMode(ImageCapture.CaptureMode.MAX_QUALITY)
+                    .build();
+        } else {
+            captureConfig = new ImageCaptureConfig.Builder()
+                    .setLensFacing(mCameraConfig.getLensFacing())
+                    .setTargetResolution(targetResolution)
+                    .setTargetRotation(rotation)
+                    .setCaptureMode(ImageCapture.CaptureMode.MAX_QUALITY)
+                    .build();
+        }
 
         mImageCapture = new ImageCapture(captureConfig);
         return mImageCapture;
+    }
+
+    public CameraConfig getCameraConfig() {
+        return mCameraConfig;
+    }
+
+    public boolean switchLensFacing() {
+        if (mCameraConfig != null) {
+            return mCameraConfig.switchLensFacing();
+        }
+        return false;
+    }
+
+    public boolean changeAspectRatio() {
+        if (mCameraConfig != null) {
+            return mCameraConfig.switchAspectRatio();
+        }
+        return false;
+    }
+
+    public boolean changeCameraResolution(int rotation) {
+        List<Size> supportedResolution = mCameraConfig.getSupportedResolution();
+        Size targetResolution = mCameraConfig.getTargetResolution(rotation);
+        if (rotation == 0) {
+            targetResolution = new Size(targetResolution.getHeight(), targetResolution.getWidth());
+        }
+        int index = supportedResolution.indexOf(targetResolution);
+
+        return mCameraConfig.setTargetResolution(supportedResolution.get((index + 1) % supportedResolution.size()));
     }
 
 

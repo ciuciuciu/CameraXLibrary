@@ -9,4 +9,6 @@ public interface CameraManagerView {
     void onAttach(TextureView textureView);
 
     void onDetach();
+
+    boolean switchLensFacing();
 }

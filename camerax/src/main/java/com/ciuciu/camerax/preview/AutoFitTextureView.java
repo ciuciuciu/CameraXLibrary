@@ -235,14 +235,14 @@ class AutoFitTextureView extends TextureView {
             bufferRotatedHeight = previewSourceWidth;
         }
 
-        Log.d(TAG, "previewSourceWidth " + previewSourceWidth);
-        Log.d(TAG, "previewSourceHeight " + previewSourceHeight);
-        Log.d(TAG, "bufferRotatedWidth " + bufferRotatedWidth);
-        Log.d(TAG, "bufferRotatedHeight " + bufferRotatedHeight);
-        Log.d(TAG, "Current-Width " + mCurrentSize.getWidth());
-        Log.d(TAG, "Current-Height " + mCurrentSize.getHeight());
-        Log.d(TAG, "xScale " + xScale);
-        Log.d(TAG, "yScale " + yScale);
+//        Log.d(TAG, "previewSourceWidth " + previewSourceWidth);
+//        Log.d(TAG, "previewSourceHeight " + previewSourceHeight);
+//        Log.d(TAG, "bufferRotatedWidth " + bufferRotatedWidth);
+//        Log.d(TAG, "bufferRotatedHeight " + bufferRotatedHeight);
+//        Log.d(TAG, "Current-Width " + mCurrentSize.getWidth());
+//        Log.d(TAG, "Current-Height " + mCurrentSize.getHeight());
+//        Log.d(TAG, "xScale " + xScale);
+//        Log.d(TAG, "yScale " + yScale);
 
         // Scale the buffer so that it just covers the viewfinder.
         if (mCameraScaleType == CameraScale.SCALE_TYPE_CENTER_CROP) {

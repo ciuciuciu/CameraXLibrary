@@ -26,7 +26,7 @@ public class CameraPreview extends RelativeLayout {
     private Preview mSourcePreview;
 
     private @CameraScale.ScaleType
-    int mCameraScaleType = CameraScale.SCALE_TYPE_CENTER_CROP;
+    int mCameraScaleType = CameraScale.SCALE_TYPE_FIT_CENTER;
 
     public CameraPreview(Context context) {
         super(context);

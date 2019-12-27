@@ -21,6 +21,7 @@ import com.ciuciu.camerax.CameraHelper;
 import com.ciuciu.camerax.R;
 import com.ciuciu.camerax.camera.CameraManager;
 import com.ciuciu.camerax.camera.CameraManagerListener;
+import com.ciuciu.camerax.camera.config.CameraConfig;
 import com.ciuciu.camerax.overlaycontroller.BaseControllerView;
 import com.ciuciu.camerax.overlaycontroller.CameraControllerListener;
 import com.ciuciu.camerax.overlaycontroller.CaptureControllerView;
@@ -84,7 +85,7 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
                 // generate preview config
                 Preview preview = mCameraManager.generatePreviewConfig(textureView.getDisplay().getRotation());
                 mCameraPreview.setPreview(preview);
-                mCameraPreview.setOverlayView(createOverlayView());
+                mCameraPreview.setOverlayView(createOverlayView(mCameraManager.getCameraConfig()));
 
                 // generate capture config
                 ImageCapture imageCapture = mCameraManager.generateCaptureConfig(textureView.getDisplay().getRotation());
@@ -97,26 +98,36 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
     }
 
     @Override
-    public BaseControllerView createOverlayView() {
+    public BaseControllerView createOverlayView(CameraConfig cameraConfig) {
         mControllerView = new CaptureControllerView(getContext());
+        mControllerView.updateCameraConfig(cameraConfig);
         mControllerView.setControllerListener(this);
         return mControllerView;
     }
 
     @Override
     public void switchLensFacing() {
-        mCameraManager.getCameraConfig().switchLensFacing();
-        openCamera();
+        if (mCameraManager.switchLensFacing()) {
+            openCamera();
+        }
     }
 
     @Override
     public void switchAspectRatio() {
-
+        if (mCameraManager.changeAspectRatio()) {
+            openCamera();
+        }
     }
 
     @Override
     public void changeResolution() {
-
+        try {
+            if (mCameraManager.changeCameraResolution(mCameraPreview.getTextureView().getDisplay().getRotation())) {
+                openCamera();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override

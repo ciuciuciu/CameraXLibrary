@@ -4,39 +4,86 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ImageButton
-        android:id="@+id/btnSwitchCamera"
-        android:layout_width="@dimen/round_button_medium"
-        android:layout_height="@dimen/round_button_medium"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="32dp"
-        android:layout_marginBottom="32dp"
-        android:adjustViewBounds="true"
-        android:background="@null"
-        android:padding="12dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/ic_switch" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
 
-    <ImageButton
-        android:id="@+id/btnCapture"
-        android:layout_width="@dimen/round_button_medium"
-        android:layout_height="@dimen/round_button_medium"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/ic_shutter"
-        android:src="@drawable/ic_outer_circle" />
+        <TextView
+            android:id="@+id/btnChangeResolution"
+            android:layout_width="96dp"
+            android:layout_height="64dp"
+            android:layout_marginLeft="32dp"
+            android:background="@drawable/ic_crop_landscape"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
-    <ImageButton
-        android:id="@+id/btnViewPhoto"
-        android:layout_width="@dimen/round_button_medium"
-        android:layout_height="@dimen/round_button_medium"
-        android:layout_alignParentRight="true"
+        <TextView
+            android:id="@+id/btnChangeRatio"
+            android:layout_width="96dp"
+            android:layout_height="64dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginRight="32dp"
+            android:background="@drawable/ic_crop_landscape"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/btnChangePreviewScale"
+            android:layout_width="96dp"
+            android:layout_height="64dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="32dp"
+            android:background="@drawable/ic_crop_landscape"
+            android:gravity="center"
+            android:text="CENTER"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="@dimen/margin_small"
-        android:layout_marginBottom="@dimen/margin_small"
-        android:background="@drawable/ic_outer_circle"
-        android:padding="@dimen/stroke_small"
-        android:src="@drawable/ic_photo" />
+        android:layout_marginBottom="32dp">
+
+        <ImageButton
+            android:id="@+id/btnSwitchCamera"
+            android:layout_width="@dimen/round_button_medium"
+            android:layout_height="@dimen/round_button_medium"
+            android:layout_marginLeft="32dp"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            android:padding="16dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_switch" />
+
+        <ImageButton
+            android:id="@+id/btnCapture"
+            android:layout_width="@dimen/round_button_medium"
+            android:layout_height="@dimen/round_button_medium"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_shutter"
+            android:src="@drawable/ic_outer_circle" />
+
+        <ImageButton
+            android:id="@+id/btnViewPhoto"
+            android:layout_width="@dimen/round_button_medium"
+            android:layout_height="@dimen/round_button_medium"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/margin_small"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:background="@drawable/ic_outer_circle"
+            android:padding="@dimen/stroke_small"
+            android:src="@drawable/ic_photo" />
+    </RelativeLayout>
 
 </RelativeLayout>

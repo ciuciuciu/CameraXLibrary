@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
+import com.ciuciu.camerax.camera.config.CameraConfig;
+
 public abstract class BaseControllerView extends RelativeLayout {
 
     protected CameraControllerListener mControllerListener;
@@ -25,11 +27,11 @@ public abstract class BaseControllerView extends RelativeLayout {
 
     private void init() {
         initView();
-
-
     }
 
     public abstract void initView();
+
+    public abstract void updateCameraConfig(CameraConfig cameraConfig);
 
     public void setControllerListener(CameraControllerListener controllerListener) {
         mControllerListener = controllerListener;
