@@ -84,7 +84,7 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
 
                 // generate preview config
                 Preview preview = mCameraManager.generatePreviewConfig(textureView.getDisplay().getRotation());
-                mCameraPreview.setPreview(preview);
+                mCameraPreview.setPreview(preview, mCameraManager.getCameraConfig().getPreviewScaleType());
                 mCameraPreview.setOverlayView(createOverlayView(mCameraManager.getCameraConfig()));
 
                 // generate capture config
@@ -132,7 +132,9 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
 
     @Override
     public void changePreviewScale() {
-
+        if (mCameraManager.changeCameraPreviewOutputScaleType()) {
+            openCamera();
+        }
     }
 
     @Override

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.camera.core.Preview;
 
 import com.ciuciu.camerax.R;
+import com.ciuciu.camerax.camera.config.PreviewScaleType;
 import com.ciuciu.camerax.overlaycontroller.BaseControllerView;
 
 public class CameraPreview extends RelativeLayout {
@@ -24,9 +25,6 @@ public class CameraPreview extends RelativeLayout {
     private BaseControllerView mOverlayView;
 
     private Preview mSourcePreview;
-
-    private @CameraScale.ScaleType
-    int mCameraScaleType = CameraScale.SCALE_TYPE_FIT_CENTER;
 
     public CameraPreview(Context context) {
         super(context);
@@ -52,13 +50,13 @@ public class CameraPreview extends RelativeLayout {
         mOverlayContainer = findViewById(R.id.overlayContainer);
     }
 
-    public TextureView getTextureView(){
+    public TextureView getTextureView() {
         return mTextureView;
     }
 
-    public void setPreview(Preview preview) {
+    public void setPreview(Preview preview, @PreviewScaleType.ScaleType int previewScale) {
         mSourcePreview = preview;
-        mTextureView.startPreview(mCameraScaleType);
+        mTextureView.startPreview(previewScale);
 
         mSourcePreview.setOnPreviewOutputUpdateListener(new Preview.OnPreviewOutputUpdateListener() {
             @Override

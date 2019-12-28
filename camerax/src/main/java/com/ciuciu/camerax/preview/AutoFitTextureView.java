@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.camera.core.Preview;
 
 import com.ciuciu.camerax.CameraHelper;
+import com.ciuciu.camerax.camera.config.PreviewScaleType;
 
 class AutoFitTextureView extends TextureView {
 
@@ -26,8 +27,8 @@ class AutoFitTextureView extends TextureView {
     private Size mPreviewSourceSize = new Size(0, 0);
     private int mPreviewSourceRotation = 0;
 
-    private @CameraScale.ScaleType
-    int mCameraScaleType = CameraScale.SCALE_TYPE_CENTER_CROP;
+    private @PreviewScaleType.ScaleType
+    int mCameraScaleType = PreviewScaleType.SCALE_TYPE_CENTER_CROP;
 
     private DisplayManager mDisplayManager;
 
@@ -96,7 +97,7 @@ class AutoFitTextureView extends TextureView {
         });
     }
 
-    public void startPreview(@CameraScale.ScaleType int scaleType) {
+    public void startPreview(@PreviewScaleType.ScaleType int scaleType) {
         mCameraScaleType = scaleType;
         mCurrentRotation = CameraHelper.getDisplaySurfaceRotation(getDisplay());
     }
@@ -154,9 +155,9 @@ class AutoFitTextureView extends TextureView {
             mPreviewSourceRotation = previewSource.getRotationDegrees();
         }
         int newTextureViewRotation;
-        if(getDisplay() != null){
+        if (getDisplay() != null) {
             newTextureViewRotation = CameraHelper.getDisplaySurfaceRotation(getDisplay());
-        }else {
+        } else {
             newTextureViewRotation = mCurrentRotation;
         }
 
@@ -245,13 +246,13 @@ class AutoFitTextureView extends TextureView {
 //        Log.d(TAG, "yScale " + yScale);
 
         // Scale the buffer so that it just covers the viewfinder.
-        if (mCameraScaleType == CameraScale.SCALE_TYPE_CENTER_CROP) {
+        if (mCameraScaleType == PreviewScaleType.SCALE_TYPE_CENTER_CROP) {
             float scale = Math.max(mCurrentSize.getWidth() / (float) bufferRotatedWidth,
                     mCurrentSize.getHeight() / (float) bufferRotatedHeight);
 
             xScale *= scale;
             yScale *= scale;
-        } else if (mCameraScaleType == CameraScale.SCALE_TYPE_FIT_CENTER) {
+        } else if (mCameraScaleType == PreviewScaleType.SCALE_TYPE_FIT_CENTER) {
             float scale = Math.min(mCurrentSize.getWidth() / (float) bufferRotatedWidth,
                     mCurrentSize.getHeight() / (float) bufferRotatedHeight);
 
@@ -321,8 +322,8 @@ class AutoFitTextureView extends TextureView {
 //        }
 //    }
 //
-    private void calculateTransform_0(Size sizePreview, @CameraScale.ScaleType int scaleType) {
-        if (scaleType == CameraScale.SCALE_TYPE_FIT_XY) {
+    private void calculateTransform_0(Size sizePreview, @PreviewScaleType.ScaleType int scaleType) {
+        if (scaleType == PreviewScaleType.SCALE_TYPE_FIT_XY) {
             //return;
         }
 
@@ -339,13 +340,13 @@ class AutoFitTextureView extends TextureView {
         Matrix matrix = new Matrix();
         matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
         float scale;
-        if (scaleType == CameraScale.SCALE_TYPE_FIT_CENTER) {
+        if (scaleType == PreviewScaleType.SCALE_TYPE_FIT_CENTER) {
             float scaleWidth = (float) width / sizePreview.getHeight();
             float scaleHeight = (float) height / sizePreview.getWidth();
             scale = Math.min(scaleWidth, scaleHeight);
             matrix.postScale(scale, scale, centerX, centerY);
 
-        } else if (scaleType == CameraScale.SCALE_TYPE_CENTER_CROP) {
+        } else if (scaleType == PreviewScaleType.SCALE_TYPE_CENTER_CROP) {
             float scaleWidth = (float) width / sizePreview.getHeight();
             float scaleHeight = (float) height / sizePreview.getWidth();
 
@@ -356,7 +357,7 @@ class AutoFitTextureView extends TextureView {
         this.setTransform(matrix);
     }
 
-    private void calculateTransform_90(Size sizePreview, int rotation, @CameraScale.ScaleType int scaleType) {
+    private void calculateTransform_90(Size sizePreview, int rotation, @PreviewScaleType.ScaleType int scaleType) {
 //        RectF viewRect = new RectF(0, 0, getHeight(), getWidth());
 //        float centerX = viewRect.centerX();
 //        float centerY = viewRect.centerY();
@@ -447,14 +448,14 @@ class AutoFitTextureView extends TextureView {
             bufferRotatedHeight = previewSourceWidth;
         }
 
-         //Scale the buffer so that it just covers the viewfinder.
-        if (mCameraScaleType == CameraScale.SCALE_TYPE_CENTER_CROP) {
+        //Scale the buffer so that it just covers the viewfinder.
+        if (mCameraScaleType == PreviewScaleType.SCALE_TYPE_CENTER_CROP) {
             float scale = Math.max(mCurrentSize.getWidth() / (float) bufferRotatedWidth,
                     mCurrentSize.getHeight() / (float) bufferRotatedHeight);
 
             xScale *= scale;
             yScale *= scale;
-        } else if (mCameraScaleType == CameraScale.SCALE_TYPE_FIT_CENTER) {
+        } else if (mCameraScaleType == PreviewScaleType.SCALE_TYPE_FIT_CENTER) {
             float scale = Math.min(mCurrentSize.getWidth() / (float) bufferRotatedWidth,
                     mCurrentSize.getHeight() / (float) bufferRotatedHeight);
 

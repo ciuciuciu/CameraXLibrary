@@ -11,41 +11,42 @@
 
         <TextView
             android:id="@+id/btnChangeResolution"
-            android:layout_width="96dp"
-            android:layout_height="64dp"
+            android:layout_width="72dp"
+            android:layout_height="36dp"
             android:layout_marginLeft="32dp"
-            android:background="@drawable/ic_crop_landscape"
+            android:background="@drawable/bg_white_rect_rounded"
             android:gravity="center"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:textSize="12sp"
             android:textStyle="bold"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/btnChangeRatio"
-            android:layout_width="96dp"
-            android:layout_height="64dp"
+            android:layout_width="72dp"
+            android:layout_height="36dp"
             android:layout_centerHorizontal="true"
             android:layout_marginRight="32dp"
-            android:background="@drawable/ic_crop_landscape"
+            android:background="@drawable/bg_white_rect_rounded"
             android:gravity="center"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:textSize="12sp"
             android:textStyle="bold"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/btnChangePreviewScale"
-            android:layout_width="96dp"
-            android:layout_height="64dp"
+            android:layout_width="72dp"
+            android:layout_height="36dp"
             android:layout_alignParentRight="true"
             android:layout_marginRight="32dp"
-            android:background="@drawable/ic_crop_landscape"
+            android:background="@drawable/bg_white_rect_rounded"
             android:gravity="center"
             android:text="CENTER"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
     </RelativeLayout>
 

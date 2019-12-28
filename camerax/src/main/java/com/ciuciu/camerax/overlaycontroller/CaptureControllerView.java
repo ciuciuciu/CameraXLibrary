@@ -10,6 +10,7 @@ import androidx.camera.core.AspectRatio;
 
 import com.ciuciu.camerax.R;
 import com.ciuciu.camerax.camera.config.CameraConfig;
+import com.ciuciu.camerax.camera.config.PreviewScaleType;
 import com.ciuciu.camerax.utils.ImageLoader;
 
 import java.io.File;
@@ -98,6 +99,21 @@ public class CaptureControllerView extends BaseControllerView {
             } else if (cameraConfig.getAspectRatio() == AspectRatio.RATIO_4_3) {
                 btnChangeRatio.setText("4:3");
                 btnChangeRatio.setVisibility(VISIBLE);
+            }
+
+            switch (cameraConfig.getPreviewScaleType()) {
+                case PreviewScaleType.SCALE_TYPE_FIT_XY:
+                    btnChangePreviewScale.setText("FIT_XY");
+                    btnChangePreviewScale.setVisibility(VISIBLE);
+                    break;
+                case PreviewScaleType.SCALE_TYPE_FIT_CENTER:
+                    btnChangePreviewScale.setText("CENTER");
+                    btnChangePreviewScale.setVisibility(VISIBLE);
+                    break;
+                case PreviewScaleType.SCALE_TYPE_CENTER_CROP:
+                    btnChangePreviewScale.setText("CROP");
+                    btnChangePreviewScale.setVisibility(VISIBLE);
+                    break;
             }
         }
     }

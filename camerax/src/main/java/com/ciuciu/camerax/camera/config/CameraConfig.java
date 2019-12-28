@@ -17,28 +17,38 @@ public class CameraConfig {
     private final AspectRatio DEFAULT_ASPECT_RATIO = AspectRatio.RATIO_16_9;
     private final int DEFAULT_TARGET_RESOLUTION_WIDTH = 1920;
     private final int DEFAULT_TARGET_RESOLUTION_HEIGHT = 1080;
+
     /**
      * Enable switch Back camera or Front camera
      */
     private final boolean ENABLE_SWITCH_LENS_FACING = true;
+
     /**
      * Enable switch camera aspect ration between AspectRatio.RATIO_16_9 or AspectRatio.RATIO_4_3
      */
     private final boolean ENABLE_CHANGE_ASPECT_RATIO = true;
+
     /**
      * Enable change camera target resolution
      */
     private final boolean ENABLE_CHANGE_TARGET_RESOLUTION = true;
+
+    /**
+     * Enable change CameraPreview output scale type
+     */
+    private final boolean ENABLE_CHANGE_PREVIEW_SCALE_TYPE = true;
 
     private Context mContext;
 
     private CameraX.LensFacing mLensFacing = DEFAULT_LENS_FACING;
     private AspectRatio mAspectRatio = DEFAULT_ASPECT_RATIO;
     private TargetResolution mTargetResolution;
+    private PreviewScaleType mPreviewScaleType;
 
     public CameraConfig(Context context) {
         mContext = context;
         mTargetResolution = new TargetResolution(mContext);
+        mPreviewScaleType = new PreviewScaleType();
     }
 
     /**
@@ -75,6 +85,7 @@ public class CameraConfig {
     public boolean switchAspectRatio() {
         if (ENABLE_CHANGE_ASPECT_RATIO) {
             mAspectRatio = mAspectRatio == AspectRatio.RATIO_16_9 ? AspectRatio.RATIO_4_3 : AspectRatio.RATIO_16_9;
+            mTargetResolution.setSize(null);
             return true;
         }
         return false;
@@ -123,4 +134,27 @@ public class CameraConfig {
         return targetResolution.getWidth() + " x " + targetResolution.getHeight();
 
     }
+
+    /**
+     * CameraPreview output scale type
+     */
+
+    public boolean isEnableChangePreviewScaleType() {
+        return ENABLE_CHANGE_PREVIEW_SCALE_TYPE;
+    }
+
+    public boolean changePreviewScaleType() {
+        if (ENABLE_CHANGE_PREVIEW_SCALE_TYPE) {
+            mPreviewScaleType.changeScaleType();
+            return true;
+
+        }
+        return false;
+    }
+
+    public int getPreviewScaleType() {
+        return mPreviewScaleType.getScaleType();
+    }
+
+
 }

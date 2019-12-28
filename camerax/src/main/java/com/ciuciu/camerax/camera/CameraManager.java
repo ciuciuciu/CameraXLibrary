@@ -167,6 +167,9 @@ public class CameraManager implements CameraManagerView {
         return mCameraConfig.setTargetResolution(supportedResolution.get((index + 1) % supportedResolution.size()));
     }
 
+    public boolean changeCameraPreviewOutputScaleType(){
+        return mCameraConfig.changePreviewScaleType();
+    }
 
     public void capturePhoto(File targetFile) {
         mImageCapture.takePicture(targetFile, createMetadata(), mainExecutor, new ImageCapture.OnImageSavedListener() {
