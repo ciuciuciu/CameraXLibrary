@@ -64,12 +64,10 @@ public class CameraPreview extends RelativeLayout {
                 if (mTextureView == null) {
                     return;
                 }
-
                 mTextureViewContainer.removeView(mTextureView);
                 mTextureViewContainer.addView(mTextureView, 0);
                 // Update internal texture
                 mTextureView.setSurfaceTexture(output.getSurfaceTexture());
-
                 // Apply relevant transformations
                 mTextureView.updateTransform(output, output.getTextureSize(), mTextureView.getCurrentSize());
             }
