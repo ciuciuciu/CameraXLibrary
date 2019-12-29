@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.camera.core.Preview;
 
 import com.ciuciu.camerax.CameraHelper;
-import com.ciuciu.camerax.camera.config.PreviewScaleType;
+import com.ciuciu.camerax.config.PreviewScaleType;
 
 class AutoFitTextureView extends TextureView {
 

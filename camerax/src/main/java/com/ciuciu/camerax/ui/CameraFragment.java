@@ -19,12 +19,10 @@ import androidx.fragment.app.Fragment;
 
 import com.ciuciu.camerax.CameraHelper;
 import com.ciuciu.camerax.R;
-import com.ciuciu.camerax.camera.CameraManager;
-import com.ciuciu.camerax.camera.CameraManagerListener;
-import com.ciuciu.camerax.camera.config.CameraConfig;
-import com.ciuciu.camerax.overlaycontroller.BaseControllerView;
-import com.ciuciu.camerax.overlaycontroller.CameraControllerListener;
-import com.ciuciu.camerax.overlaycontroller.CaptureControllerView;
+import com.ciuciu.camerax.controller.CameraControllerListener;
+import com.ciuciu.camerax.controller.CaptureControllerView;
+import com.ciuciu.camerax.manager.CameraManager;
+import com.ciuciu.camerax.manager.CameraManagerListener;
 import com.ciuciu.camerax.preview.CameraPreview;
 import com.ciuciu.camerax.ui.viewer.PhotoViewerActivity;
 import com.ciuciu.camerax.utils.FileUtils;
@@ -36,10 +34,7 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
     private final String TAG = CameraFragment.class.getSimpleName();
 
     private CameraPreview mCameraPreview;
-    private CaptureControllerView mControllerView;
-
     private CameraManager mCameraManager;
-
     private File mLastCaptureFile;
 
     public static Fragment newInstance() {
@@ -65,6 +60,9 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
         mCameraPreview = view.findViewById(R.id.cameraPreview);
 
         mCameraManager = new CameraManager(getContext());
+        CaptureControllerView mControllerView = new CaptureControllerView(getContext());
+        mControllerView.setControllerListener(this);
+        mCameraManager.setControllerView(mControllerView);
         mCameraManager.setListener(CameraFragment.this);
 
         openCamera();
@@ -85,7 +83,7 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
                 // generate preview config
                 Preview preview = mCameraManager.generatePreviewConfig(textureView.getDisplay().getRotation());
                 mCameraPreview.setPreview(preview, mCameraManager.getCameraConfig().getPreviewScaleType());
-                mCameraPreview.setOverlayView(createOverlayView(mCameraManager.getCameraConfig()));
+                mCameraPreview.setOverlayView(mCameraManager.getControllerView());
 
                 // generate capture config
                 ImageCapture imageCapture = mCameraManager.generateCaptureConfig(textureView.getDisplay().getRotation());
@@ -95,14 +93,6 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
                 CameraX.bindToLifecycle(CameraFragment.this, preview, imageCapture);
             }
         });
-    }
-
-    @Override
-    public BaseControllerView createOverlayView(CameraConfig cameraConfig) {
-        mControllerView = new CaptureControllerView(getContext());
-        mControllerView.updateCameraConfig(cameraConfig);
-        mControllerView.setControllerListener(this);
-        return mControllerView;
     }
 
     @Override
@@ -166,8 +156,8 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
         mLastCaptureFile = photoFile;
 
         // Update the gallery thumbnail with latest picture taken
-        if (mControllerView != null) {
-            mControllerView.setGalleryThumbnail(photoFile);
+        if (mCameraManager.getControllerView() != null && mCameraManager.getControllerView() instanceof CaptureControllerView) {
+            ((CaptureControllerView) mCameraManager.getControllerView()).setGalleryThumbnail(photoFile);
         }
     }
 

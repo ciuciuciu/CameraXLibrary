@@ -1,4 +1,4 @@
-package com.ciuciu.camerax.camera;
+package com.ciuciu.camerax.manager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

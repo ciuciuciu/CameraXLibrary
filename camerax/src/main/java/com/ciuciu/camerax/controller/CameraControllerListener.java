@@ -1,4 +1,4 @@
-package com.ciuciu.camerax.overlaycontroller;
+package com.ciuciu.camerax.controller;
 
 public interface CameraControllerListener {
 

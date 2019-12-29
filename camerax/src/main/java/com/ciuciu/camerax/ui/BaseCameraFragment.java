@@ -10,8 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.ciuciu.camerax.CameraHelper;
-import com.ciuciu.camerax.camera.config.CameraConfig;
-import com.ciuciu.camerax.overlaycontroller.BaseControllerView;
 
 public abstract class BaseCameraFragment extends Fragment {
 
@@ -44,8 +42,6 @@ public abstract class BaseCameraFragment extends Fragment {
     protected abstract void initFragment(@NonNull View view);
 
     public abstract void openCamera();
-
-    public abstract BaseControllerView createOverlayView(CameraConfig cameraConfig);
 
     /**
      * Shows a {@link Toast} on the UI thread.

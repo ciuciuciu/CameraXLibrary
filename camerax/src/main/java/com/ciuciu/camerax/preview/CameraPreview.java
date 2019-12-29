@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.camera.core.Preview;
 
 import com.ciuciu.camerax.R;
-import com.ciuciu.camerax.camera.config.PreviewScaleType;
-import com.ciuciu.camerax.overlaycontroller.BaseControllerView;
+import com.ciuciu.camerax.config.PreviewScaleType;
+import com.ciuciu.camerax.controller.BaseControllerView;
 
 public class CameraPreview extends RelativeLayout {
 

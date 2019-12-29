@@ -1,4 +1,4 @@
-package com.ciuciu.camerax.overlaycontroller;
+package com.ciuciu.camerax.controller;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,8 +9,8 @@ import android.widget.TextView;
 import androidx.camera.core.AspectRatio;
 
 import com.ciuciu.camerax.R;
-import com.ciuciu.camerax.camera.config.CameraConfig;
-import com.ciuciu.camerax.camera.config.PreviewScaleType;
+import com.ciuciu.camerax.config.CameraConfig;
+import com.ciuciu.camerax.config.PreviewScaleType;
 import com.ciuciu.camerax.utils.ImageLoader;
 
 import java.io.File;

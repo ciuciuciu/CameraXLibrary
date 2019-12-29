@@ -1,4 +1,4 @@
-package com.ciuciu.camerax.camera.config;
+package com.ciuciu.camerax.config;
 
 import android.content.Context;
 import android.graphics.ImageFormat;

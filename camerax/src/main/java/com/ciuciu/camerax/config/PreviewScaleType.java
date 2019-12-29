@@ -1,4 +1,4 @@
-package com.ciuciu.camerax.camera.config;
+package com.ciuciu.camerax.config;
 
 import androidx.annotation.IntDef;
 

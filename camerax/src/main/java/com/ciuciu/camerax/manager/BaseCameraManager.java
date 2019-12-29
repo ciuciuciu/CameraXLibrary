@@ -1,4 +1,4 @@
-package com.ciuciu.camerax.camera;
+package com.ciuciu.camerax.manager;
 
 import android.content.Context;
 import android.hardware.display.DisplayManager;
@@ -7,36 +7,27 @@ import android.util.Size;
 import android.view.TextureView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureConfig;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
-import androidx.core.content.ContextCompat;
 
-import com.ciuciu.camerax.camera.config.CameraConfig;
+import com.ciuciu.camerax.config.CameraConfig;
+import com.ciuciu.camerax.controller.BaseControllerView;
 
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.Executor;
+public abstract class BaseCameraManager {
 
-public class CameraManager implements CameraManagerView {
+    private final String TAG = "CameraManager";
 
-    private final String TAG = CameraManager.class.getSimpleName();
+    protected CameraConfig mCameraConfig;
+    protected BaseControllerView mControllerView;
 
-    private Context mContext;
+    protected Preview mPreview;
+    protected ImageCapture mImageCapture;
+
     private DisplayManager mDisplayManager;
-    private Executor mainExecutor;
-    private CameraManagerListener mCameraManagerListener;
-
-    private Preview mPreview;
-    private ImageCapture mImageCapture;
-
-    private CameraConfig mCameraConfig;
-
     private TextureView mAttachedTextureView;
-    private int mTextureDisplayId = -1;
+    private int mAttachedTextureDisplayId = -1;
 
     private DisplayManager.DisplayListener displayListener = new DisplayManager.DisplayListener() {
         @Override
@@ -51,7 +42,7 @@ public class CameraManager implements CameraManagerView {
 
         @Override
         public void onDisplayChanged(int displayId) {
-            if (displayId == CameraManager.this.mTextureDisplayId) {
+            if (displayId == BaseCameraManager.this.mAttachedTextureDisplayId) {
                 Log.d(TAG, "Rotation changed: " + displayId);
                 if (mPreview != null && mAttachedTextureView != null && mAttachedTextureView.getDisplay() != null) {
                     Log.d(TAG, "Set new rotation " + mAttachedTextureView.getDisplay().getRotation() + " for Preview");
@@ -67,28 +58,34 @@ public class CameraManager implements CameraManagerView {
         }
     };
 
-    public CameraManager(Context context) {
-        mContext = context;
-        mCameraConfig = new CameraConfig(mContext);
-        mainExecutor = ContextCompat.getMainExecutor(context);
-    }
-
-    @Override
-    public void setListener(CameraManagerListener listener) {
-        mCameraManagerListener = listener;
-    }
-
-    @Override
     public void onAttach(@NonNull TextureView textureView) {
-        mTextureDisplayId = textureView.getDisplay().getDisplayId();
         mAttachedTextureView = textureView;
+        mAttachedTextureDisplayId = textureView.getDisplay().getDisplayId();
+
         mDisplayManager = (DisplayManager) textureView.getContext().getSystemService(Context.DISPLAY_SERVICE);
         mDisplayManager.registerDisplayListener(displayListener, null);
+
+        if (mControllerView != null) {
+            mControllerView.updateCameraConfig(mCameraConfig);
+        }
     }
 
-    @Override
     public void onDetach() {
         mDisplayManager.unregisterDisplayListener(displayListener);
+    }
+
+    public abstract void setListener(CameraManagerListener listener);
+
+    public CameraConfig getCameraConfig() {
+        return mCameraConfig;
+    }
+
+    public void setControllerView(BaseControllerView controllerView) {
+        mControllerView = controllerView;
+    }
+
+    public BaseControllerView getControllerView() {
+        return mControllerView;
     }
 
     public Preview generatePreviewConfig(int rotation) {
@@ -138,61 +135,4 @@ public class CameraManager implements CameraManagerView {
         return mImageCapture;
     }
 
-    public CameraConfig getCameraConfig() {
-        return mCameraConfig;
-    }
-
-    public boolean switchLensFacing() {
-        if (mCameraConfig != null) {
-            return mCameraConfig.switchLensFacing();
-        }
-        return false;
-    }
-
-    public boolean changeAspectRatio() {
-        if (mCameraConfig != null) {
-            return mCameraConfig.switchAspectRatio();
-        }
-        return false;
-    }
-
-    public boolean changeCameraResolution(int rotation) {
-        List<Size> supportedResolution = mCameraConfig.getSupportedResolution();
-        Size targetResolution = mCameraConfig.getTargetResolution(rotation);
-        if (rotation == 0) {
-            targetResolution = new Size(targetResolution.getHeight(), targetResolution.getWidth());
-        }
-        int index = supportedResolution.indexOf(targetResolution);
-
-        return mCameraConfig.setTargetResolution(supportedResolution.get((index + 1) % supportedResolution.size()));
-    }
-
-    public boolean changeCameraPreviewOutputScaleType(){
-        return mCameraConfig.changePreviewScaleType();
-    }
-
-    public void capturePhoto(File targetFile) {
-        mImageCapture.takePicture(targetFile, createMetadata(), mainExecutor, new ImageCapture.OnImageSavedListener() {
-            @Override
-            public void onImageSaved(@NonNull File photoFile) {
-                if (mCameraManagerListener != null) {
-                    mCameraManagerListener.onCapturePhotoSuccess(photoFile);
-                }
-            }
-
-            @Override
-            public void onError(@NonNull ImageCapture.ImageCaptureError imageCaptureError, @NonNull String message, @Nullable Throwable cause) {
-                cause.printStackTrace();
-                if (mCameraManagerListener != null) {
-                    mCameraManagerListener.onCapturePhotoError(imageCaptureError, message, cause);
-                }
-            }
-        });
-    }
-
-    private ImageCapture.Metadata createMetadata() {
-        ImageCapture.Metadata metadata = new ImageCapture.Metadata();
-        metadata.isReversedHorizontal = mCameraConfig.getLensFacing() == CameraX.LensFacing.FRONT;
-        return metadata;
-    }
 }

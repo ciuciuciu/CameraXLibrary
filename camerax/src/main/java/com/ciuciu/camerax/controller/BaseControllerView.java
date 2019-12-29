@@ -1,10 +1,10 @@
-package com.ciuciu.camerax.overlaycontroller;
+package com.ciuciu.camerax.controller;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
-import com.ciuciu.camerax.camera.config.CameraConfig;
+import com.ciuciu.camerax.config.CameraConfig;
 
 public abstract class BaseControllerView extends RelativeLayout {
 
@@ -36,6 +36,4 @@ public abstract class BaseControllerView extends RelativeLayout {
     public void setControllerListener(CameraControllerListener controllerListener) {
         mControllerListener = controllerListener;
     }
-
-
 }
