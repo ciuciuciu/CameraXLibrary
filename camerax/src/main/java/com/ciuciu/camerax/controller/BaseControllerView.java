@@ -5,9 +5,11 @@ import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
 import com.ciuciu.camerax.config.CameraConfig;
+import com.ciuciu.camerax.controller.overlay.BaseOverlayView;
 
 public abstract class BaseControllerView extends RelativeLayout {
 
+    protected BaseOverlayView mOverlayView;
     protected CameraControllerListener mControllerListener;
 
     public BaseControllerView(Context context) {
@@ -27,11 +29,18 @@ public abstract class BaseControllerView extends RelativeLayout {
 
     private void init() {
         initView();
+        initOverlayView();
     }
 
     public abstract void initView();
 
+    public abstract void initOverlayView();
+
     public abstract void updateCameraConfig(CameraConfig cameraConfig);
+
+    public BaseOverlayView getOverlayView() {
+        return mOverlayView;
+    }
 
     public void setControllerListener(CameraControllerListener controllerListener) {
         mControllerListener = controllerListener;

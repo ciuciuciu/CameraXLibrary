@@ -28,6 +28,11 @@ public class QrCodeControllerView extends BaseControllerView {
     }
 
     @Override
+    public void initOverlayView() {
+
+    }
+
+    @Override
     public void updateCameraConfig(CameraConfig cameraConfig) {
 
     }

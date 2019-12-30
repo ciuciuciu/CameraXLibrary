@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.camera.core.AspectRatio;
@@ -11,11 +12,15 @@ import androidx.camera.core.AspectRatio;
 import com.ciuciu.camerax.R;
 import com.ciuciu.camerax.config.CameraConfig;
 import com.ciuciu.camerax.config.PreviewScaleType;
+import com.ciuciu.camerax.controller.overlay.CropOverlayView;
+import com.ciuciu.camerax.controller.overlay.ScanOverlayView;
 import com.ciuciu.camerax.utils.ImageLoader;
 
 import java.io.File;
 
 public class CaptureControllerView extends BaseControllerView {
+
+    private RelativeLayout overlayContainer;
 
     private TextView btnChangeResolution;
     private TextView btnChangeRatio;
@@ -41,6 +46,8 @@ public class CaptureControllerView extends BaseControllerView {
     public void initView() {
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         layoutInflater.inflate(R.layout.layout_view_controller_capture, this);
+
+        overlayContainer = findViewById(R.id.overlayContainer);
 
         btnChangeResolution = findViewById(R.id.btnChangeResolution);
         btnChangeRatio = findViewById(R.id.btnChangeRatio);
@@ -85,6 +92,15 @@ public class CaptureControllerView extends BaseControllerView {
                 mControllerListener.openImageGallery();
             }
         });
+    }
+
+    @Override
+    public void initOverlayView() {
+        overlayContainer.removeAllViews();
+
+        mOverlayView = new ScanOverlayView(getContext());
+        overlayContainer.addView(mOverlayView);
+        overlayContainer.setVisibility(VISIBLE);
     }
 
     @Override
