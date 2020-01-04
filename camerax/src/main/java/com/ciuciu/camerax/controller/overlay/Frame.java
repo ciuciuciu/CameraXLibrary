@@ -1,5 +1,7 @@
 package com.ciuciu.camerax.controller.overlay;
 
+import android.graphics.Rect;
+
 public class Frame {
 
     private float left;
@@ -12,6 +14,10 @@ public class Frame {
         this.right = right;
         this.top = top;
         this.bottom = bottom;
+    }
+
+    public Rect toRect() {
+        return new Rect((int) left, (int) top, (int) right, (int) bottom);
     }
 
     public float getLeft() {

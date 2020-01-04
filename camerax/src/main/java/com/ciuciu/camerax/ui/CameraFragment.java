@@ -31,8 +31,6 @@ import java.io.File;
 
 public class CameraFragment extends BaseCameraFragment implements CameraControllerListener, CameraManagerListener {
 
-    private final String TAG = CameraFragment.class.getSimpleName();
-
     private CameraPreview mCameraPreview;
     private CameraManager mCameraManager;
     private File mLastCaptureFile;

@@ -57,6 +57,12 @@ public class CropOverlayView extends BaseOverlayView {
         super.onLayout(changed, left, top, right, bottom);
         mOuterFrame = null;
         mInnerFrame = null;
+        mBitmap = null;
+
+        borderPath1 = null;
+        borderPath2 = null;
+        borderPath3 = null;
+        borderPath4 = null;
     }
 
     @Override
@@ -68,7 +74,7 @@ public class CropOverlayView extends BaseOverlayView {
         if (mBitmap == null || mOuterFrame == null || mInnerFrame == null) {
             synchronized (canvas) {
                 createFrame(width, height);
-                mBitmap = createBitmap(canvas.getWidth(), canvas.getHeight());
+                mBitmap = createBitmap(width, height);
             }
         }
 

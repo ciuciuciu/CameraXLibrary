@@ -17,7 +17,7 @@ import com.ciuciu.camerax.controller.BaseControllerView;
 
 public abstract class BaseCameraManager {
 
-    private final String TAG = "CameraManager";
+    protected final String TAG = "CameraManager";
 
     protected CameraConfig mCameraConfig;
     protected BaseControllerView mControllerView;

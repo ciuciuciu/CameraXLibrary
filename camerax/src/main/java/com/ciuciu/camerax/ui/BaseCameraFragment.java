@@ -19,7 +19,7 @@ public abstract class BaseCameraFragment extends Fragment {
     public final long ANIMATION_FAST_MILLIS = 50L;
     public final long ANIMATION_SLOW_MILLIS = 100L;
 
-    private final String TAG = BaseCameraFragment.class.getSimpleName();
+    protected final String TAG = "CameraFragment";
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
