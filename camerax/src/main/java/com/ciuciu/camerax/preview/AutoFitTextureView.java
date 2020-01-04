@@ -182,6 +182,8 @@ class AutoFitTextureView extends TextureView {
         Log.d(TAG, "bufferRotatedHeight " + bufferRotatedHeight);
         Log.d(TAG, "Current-Width " + mCurrentSize.getWidth());
         Log.d(TAG, "Current-Height " + mCurrentSize.getHeight());
+        Log.d(TAG, "PreviewSourceRotation " + mPreviewSourceRotation);
+        Log.d(TAG, "mCurrentRotation " + mCurrentRotation);
         Log.d(TAG, "xScale " + xScale);
         Log.d(TAG, "yScale " + yScale);
 

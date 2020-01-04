@@ -98,9 +98,9 @@ public class CaptureControllerView extends BaseControllerView {
     public void initOverlayView() {
         overlayContainer.removeAllViews();
 
-        mOverlayView = new ScanOverlayView(getContext());
+        /*mOverlayView = new CropOverlayView(getContext());
         overlayContainer.addView(mOverlayView);
-        overlayContainer.setVisibility(VISIBLE);
+        overlayContainer.setVisibility(VISIBLE);*/
     }
 
     @Override

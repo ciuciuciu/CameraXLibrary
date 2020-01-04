@@ -71,7 +71,9 @@ public abstract class BaseCameraManager {
     }
 
     public void onDetach() {
-        mDisplayManager.unregisterDisplayListener(displayListener);
+        if (mDisplayManager != null) {
+            mDisplayManager.unregisterDisplayListener(displayListener);
+        }
     }
 
     public abstract void setListener(CameraManagerListener listener);
