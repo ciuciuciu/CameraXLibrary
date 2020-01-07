@@ -22,7 +22,8 @@ public class CameraManager extends BaseCameraManager {
     private CameraManagerListener mCameraManagerListener;
 
     public CameraManager(Context context) {
-        mCameraConfig = new CameraConfig(context);
+        mCameraConfig = new CameraConfig.Builder()
+                .build(context);
         mainExecutor = ContextCompat.getMainExecutor(context);
     }
 

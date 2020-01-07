@@ -51,7 +51,8 @@ public abstract class BaseCameraManager {
 
                 if (mImageCapture != null && mAttachedTextureView != null && mAttachedTextureView.getDisplay() != null) {
                     Log.d(TAG, "Set new rotation " + mAttachedTextureView.getDisplay().getRotation() + " for ImageCapture");
-                    mImageCapture.setTargetRotation(mAttachedTextureView.getDisplay().getRotation());
+                    //mImageCapture.setTargetRotation(mAttachedTextureView.getDisplay().getRotation());
+                    generateCaptureConfig(mAttachedTextureView.getDisplay().getRotation());
                 }
                 //imageAnalyzer?.setTargetRotation(view.display.rotation);
             }
