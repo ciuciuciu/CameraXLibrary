@@ -22,6 +22,7 @@ import com.ciuciu.camerax.R;
 import com.ciuciu.camerax.controller.CameraControllerListener;
 import com.ciuciu.camerax.controller.CaptureControllerView;
 import com.ciuciu.camerax.manager.CameraManager;
+import com.ciuciu.camerax.manager.CameraManagerImpl;
 import com.ciuciu.camerax.manager.CameraManagerListener;
 import com.ciuciu.camerax.preview.CameraPreview;
 import com.ciuciu.camerax.ui.viewer.PhotoViewerActivity;
@@ -57,7 +58,8 @@ public class CameraFragment extends BaseCameraFragment {
     protected void initFragment(@NonNull View view) {
         mCameraPreview = view.findViewById(R.id.cameraPreview);
 
-        mCameraManager = new CameraManager(getContext());
+        mCameraManager = new CameraManagerImpl(getContext());
+
         CaptureControllerView mControllerView = new CaptureControllerView(getContext());
         mControllerView.setControllerListener(cameraControllerListener);
         mCameraManager.setControllerView(mControllerView);

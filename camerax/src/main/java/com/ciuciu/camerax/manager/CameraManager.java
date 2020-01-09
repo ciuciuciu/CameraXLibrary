@@ -1,35 +1,118 @@
 package com.ciuciu.camerax.manager;
 
 import android.content.Context;
+import android.hardware.display.DisplayManager;
 import android.util.Size;
+import android.view.TextureView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureConfig;
+import androidx.camera.core.Preview;
+import androidx.camera.core.PreviewConfig;
 import androidx.core.content.ContextCompat;
 
 import com.ciuciu.camerax.config.CameraConfig;
-import com.ciuciu.camerax.controller.overlay.Frame;
+import com.ciuciu.camerax.controller.BaseControllerView;
 
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public class CameraManager extends BaseCameraManager {
+public abstract class CameraManager {
 
-    private Executor mainExecutor;
+    protected final String TAG = "CameraManager";
 
-    public CameraManager(Context context) {
-        mCameraConfig = new CameraConfig.Builder().build(context);
-        mainExecutor = ContextCompat.getMainExecutor(context);
-    }
+    protected Preview mPreview;
+    protected ImageCapture mImageCapture;
+
+    protected CameraConfig mCameraConfig;
+    protected BaseControllerView mControllerView;
+
+    protected Executor mainExecutor;
+    protected DisplayManager.DisplayListener mDisplayListener;
+
+    protected CameraManagerListener mCameraManagerListener;
 
     public CameraManager(Context context, @Nullable CameraConfig cameraConfig) {
         mCameraConfig = cameraConfig;
         mainExecutor = ContextCompat.getMainExecutor(context);
     }
 
+    public abstract void onAttach(@NonNull TextureView textureView);
+
+    public abstract void onDetach();
+
+    public abstract void capturePhoto(File targetFile);
+
+    public void setListener(CameraManagerListener listener) {
+        mCameraManagerListener = listener;
+    }
+
+    public CameraConfig getCameraConfig() {
+        return mCameraConfig;
+    }
+
+    public void setControllerView(BaseControllerView controllerView) {
+        mControllerView = controllerView;
+    }
+
+    public BaseControllerView getControllerView() {
+        return mControllerView;
+    }
+
+    public Preview generatePreviewConfig(int rotation) {
+        Size targetResolution = mCameraConfig.getTargetResolution(rotation);
+
+        PreviewConfig previewConfig;
+        if (targetResolution == null) {
+            previewConfig = new PreviewConfig.Builder()
+                    .setLensFacing(mCameraConfig.getLensFacing())
+                    .setTargetAspectRatio(mCameraConfig.getAspectRatio())
+                    .setTargetRotation(rotation)
+                    .build();
+
+        } else {
+            previewConfig = new PreviewConfig.Builder()
+                    .setLensFacing(mCameraConfig.getLensFacing())
+                    .setTargetResolution(targetResolution)
+                    .setTargetRotation(rotation)
+                    .build();
+        }
+
+        mPreview = new Preview(previewConfig);
+        return mPreview;
+    }
+
+    public ImageCapture generateCaptureConfig(int rotation) {
+        Size targetResolution = mCameraConfig.getTargetResolution(rotation);
+
+        ImageCaptureConfig captureConfig;
+        if (targetResolution == null) {
+            captureConfig = new ImageCaptureConfig.Builder()
+                    .setLensFacing(mCameraConfig.getLensFacing())
+                    .setTargetAspectRatio(mCameraConfig.getAspectRatio())
+                    .setTargetRotation(rotation)
+                    .setCaptureMode(ImageCapture.CaptureMode.MAX_QUALITY)
+                    .build();
+        } else {
+            captureConfig = new ImageCaptureConfig.Builder()
+                    .setLensFacing(mCameraConfig.getLensFacing())
+                    .setTargetResolution(targetResolution)
+                    .setTargetRotation(rotation)
+                    .setCaptureMode(ImageCapture.CaptureMode.MAX_QUALITY)
+                    .build();
+        }
+
+        mImageCapture = new ImageCapture(captureConfig);
+        return mImageCapture;
+    }
+
+
+    /**
+     * Camera Config change
+     */
     public void switchLensFacing() {
         if (mCameraConfig.switchLensFacing()) {
             cameraConfigShouldChange();
@@ -61,101 +144,12 @@ public class CameraManager extends BaseCameraManager {
         }
     }
 
-    public void capturePhoto(File targetFile) {
-
-        File tempFile = new File(targetFile.getParent(), "temp.dat");
-        if (tempFile.exists()) {
-            tempFile.delete();
+    protected void cameraConfigShouldChange() {
+        if (mCameraManagerListener != null) {
+            mCameraManagerListener.onCameraConfigChanged();
         }
-
-        Frame cropFrame = null;
-        if (mControllerView != null && mControllerView.getOverlayView() != null) {
-            if (mControllerView.getOverlayView().getInnerFrame() != null) {
-                //cropFrame= mControllerView.getOverlayView().getOutputTransformFrame(image, rotationDegrees);
-            }
-        }
-
-        mImageCapture.takePicture(tempFile, createMetadata(), mainExecutor, new ImageCapture.OnImageSavedListener() {
-            @Override
-            public void onImageSaved(@NonNull File photoFile) {
-                if (cropFrame == null) {
-                    // rename tempFile to targetFile
-                    photoFile.renameTo(targetFile);
-                    if (mCameraManagerListener != null) {
-                        mCameraManagerListener.onCapturePhotoSuccess(targetFile);
-                    }
-                } else {
-                    // crop image and save to targetFile
-                }
-            }
-
-            @Override
-            public void onError(@NonNull ImageCapture.ImageCaptureError imageCaptureError, @NonNull String message, @Nullable Throwable cause) {
-                cause.printStackTrace();
-                if (mCameraManagerListener != null) {
-                    mCameraManagerListener.onCapturePhotoError(imageCaptureError, message, cause);
-                }
-            }
-        });
-
-        /*mImageCapture.takePicture(mainExecutor, new ImageCapture.OnImageCapturedListener() {
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onCaptureSuccess(ImageProxy image, int rotationDegrees) {
-
-                if (mControllerView != null && mControllerView.getOverlayView() != null) {
-                    if (mControllerView.getOverlayView().getInnerFrame() != null) {
-                        Frame frame = mControllerView.getOverlayView().getOutputTransformFrame(image, rotationDegrees);
-                        if (frame != null) {
-                            image.setCropRect(frame.toRect());
-                        }
-                    }
-                }
-
-                ImageCapture.Metadata metadata = createMetadata();
-//                CameraXExecutors
-//                        .ioExecutor()
-//                        .execute(
-//                                new ImageSaver(
-//                                        image,
-//                                        targetFile,
-//                                        rotationDegrees,
-//                                        metadata.isReversedHorizontal,
-//                                        metadata.isReversedVertical,
-//                                        null,
-//                                        mainExecutor,
-//                                        new ImageSaver.OnImageSavedListener() {
-//                                            @Override
-//                                            public void onImageSaved(File file) {
-//                                                if (mCameraManagerListener != null) {
-//                                                    mCameraManagerListener.onCapturePhotoSuccess(file);
-//                                                }
-//                                            }
-//
-//                                            @Override
-//                                            public void onError(ImageSaver.SaveError saveError, String message, @Nullable Throwable cause) {
-//                                                cause.printStackTrace();
-//                                                if (mCameraManagerListener != null) {
-//                                                    //mCameraManagerListener.onCapturePhotoError(saveError, message, cause);
-//                                                }
-//                                            }
-//                                        }));
-            }
-
-            @Override
-            public void onError(@NonNull ImageCapture.ImageCaptureError imageCaptureError, @NonNull String message, @Nullable Throwable cause) {
-                super.onError(imageCaptureError, message, cause);
-                cause.printStackTrace();
-                if (mCameraManagerListener != null) {
-                    mCameraManagerListener.onCapturePhotoError(imageCaptureError, message, cause);
-                }
-            }
-        });*/
     }
-
-    private ImageCapture.Metadata createMetadata() {
-        ImageCapture.Metadata metadata = new ImageCapture.Metadata();
-        metadata.isReversedHorizontal = mCameraConfig.getLensFacing() == CameraX.LensFacing.FRONT;
-        return metadata;
-    }
+    /**
+     * End Camera Config change
+     */
 }
