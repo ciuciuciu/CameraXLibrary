@@ -29,7 +29,7 @@ import com.ciuciu.camerax.utils.FileUtils;
 
 import java.io.File;
 
-public class CameraFragment extends BaseCameraFragment implements CameraControllerListener, CameraManagerListener {
+public class CameraFragment extends BaseCameraFragment {
 
     private CameraPreview mCameraPreview;
     private CameraManager mCameraManager;
@@ -59,9 +59,9 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
 
         mCameraManager = new CameraManager(getContext());
         CaptureControllerView mControllerView = new CaptureControllerView(getContext());
-        mControllerView.setControllerListener(this);
+        mControllerView.setControllerListener(cameraControllerListener);
         mCameraManager.setControllerView(mControllerView);
-        mCameraManager.setListener(CameraFragment.this);
+        mCameraManager.setListener(cameraManagerListener);
 
         openCamera();
     }
@@ -93,76 +93,76 @@ public class CameraFragment extends BaseCameraFragment implements CameraControll
         });
     }
 
-    @Override
-    public void switchLensFacing() {
-        if (mCameraManager.switchLensFacing()) {
-            openCamera();
-        }
-    }
 
-    @Override
-    public void switchAspectRatio() {
-        if (mCameraManager.changeAspectRatio()) {
-            openCamera();
-        }
-    }
+    CameraControllerListener cameraControllerListener = new CameraControllerListener() {
 
-    @Override
-    public void changeResolution() {
-        try {
-            if (mCameraManager.changeCameraResolution(mCameraPreview.getTextureView().getDisplay().getRotation())) {
-                openCamera();
+        @Override
+        public void switchLensFacing() {
+            mCameraManager.switchLensFacing();
+        }
+
+        @Override
+        public void switchAspectRatio() {
+            mCameraManager.changeAspectRatio();
+        }
+
+        @Override
+        public void changeResolution() {
+            mCameraManager.changeCameraResolution(mCameraPreview.getTextureView().getDisplay().getRotation());
+        }
+
+        @Override
+        public void changePreviewScale() {
+            mCameraManager.changeCameraPreviewOutputScaleType();
+        }
+
+        @Override
+        public void captureImage() {
+            mCameraManager.capturePhoto(
+                    FileUtils.createFile(
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                            FileUtils.FILENAME,
+                            FileUtils.PHOTO_EXTENSION));
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // Display flash animation to indicate that photo was captured
+                getView().postDelayed(() -> {
+                    getView().setForeground(new ColorDrawable(Color.WHITE));
+                    getView().postDelayed(() -> getView().setForeground(null), ANIMATION_FAST_MILLIS);
+                }, ANIMATION_SLOW_MILLIS);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
-    }
 
-    @Override
-    public void changePreviewScale() {
-        if (mCameraManager.changeCameraPreviewOutputScaleType()) {
+        @Override
+        public void openImageGallery() {
+            if (mLastCaptureFile != null) {
+                PhotoViewerActivity.startActivity(getContext(), mLastCaptureFile);
+            }
+        }
+    };
+
+    CameraManagerListener cameraManagerListener = new CameraManagerListener() {
+
+        @Override
+        public void onCameraConfigChanged() {
             openCamera();
         }
-    }
 
-    @Override
-    public void captureImage() {
-        mCameraManager.capturePhoto(
-                FileUtils.createFile(
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                        FileUtils.FILENAME,
-                        FileUtils.PHOTO_EXTENSION));
+        @Override
+        public void onCapturePhotoSuccess(@NonNull File photoFile) {
+            mLastCaptureFile = photoFile;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // Display flash animation to indicate that photo was captured
-            getView().postDelayed(() -> {
-                getView().setForeground(new ColorDrawable(Color.WHITE));
-                getView().postDelayed(() -> getView().setForeground(null), ANIMATION_FAST_MILLIS);
-            }, ANIMATION_SLOW_MILLIS);
+            // Update the gallery thumbnail with latest picture taken
+            if (mCameraManager.getControllerView() != null && mCameraManager.getControllerView() instanceof CaptureControllerView) {
+                ((CaptureControllerView) mCameraManager.getControllerView()).setGalleryThumbnail(photoFile);
+            }
         }
-    }
 
-    @Override
-    public void openImageGallery() {
-        if (mLastCaptureFile != null) {
-            PhotoViewerActivity.startActivity(getContext(), mLastCaptureFile);
+        @Override
+        public void onCapturePhotoError(@NonNull ImageCapture.ImageCaptureError imageCaptureError, @NonNull String message, @Nullable Throwable cause) {
+
         }
-    }
-
-    @Override
-    public void onCapturePhotoSuccess(@NonNull File photoFile) {
-        mLastCaptureFile = photoFile;
-
-        // Update the gallery thumbnail with latest picture taken
-        if (mCameraManager.getControllerView() != null && mCameraManager.getControllerView() instanceof CaptureControllerView) {
-            ((CaptureControllerView) mCameraManager.getControllerView()).setGalleryThumbnail(photoFile);
-        }
-    }
-
-    @Override
-    public void onCapturePhotoError(@NonNull ImageCapture.ImageCaptureError imageCaptureError, @NonNull String message, @Nullable Throwable cause) {
-
-    }
+    };
 
 
 }

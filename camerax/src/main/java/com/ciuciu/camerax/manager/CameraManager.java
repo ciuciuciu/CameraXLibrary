@@ -19,34 +19,30 @@ import java.util.concurrent.Executor;
 public class CameraManager extends BaseCameraManager {
 
     private Executor mainExecutor;
-    private CameraManagerListener mCameraManagerListener;
 
     public CameraManager(Context context) {
-        mCameraConfig = new CameraConfig.Builder()
-                .build(context);
+        mCameraConfig = new CameraConfig.Builder().build(context);
         mainExecutor = ContextCompat.getMainExecutor(context);
     }
 
-    @Override
-    public void setListener(CameraManagerListener listener) {
-        mCameraManagerListener = listener;
+    public CameraManager(Context context, @Nullable CameraConfig cameraConfig) {
+        mCameraConfig = cameraConfig;
+        mainExecutor = ContextCompat.getMainExecutor(context);
     }
 
-    public boolean switchLensFacing() {
-        if (mCameraConfig != null) {
-            return mCameraConfig.switchLensFacing();
+    public void switchLensFacing() {
+        if (mCameraConfig.switchLensFacing()) {
+            cameraConfigShouldChange();
         }
-        return false;
     }
 
-    public boolean changeAspectRatio() {
-        if (mCameraConfig != null) {
-            return mCameraConfig.switchAspectRatio();
+    public void changeAspectRatio() {
+        if (mCameraConfig.switchAspectRatio()) {
+            cameraConfigShouldChange();
         }
-        return false;
     }
 
-    public boolean changeCameraResolution(int rotation) {
+    public void changeCameraResolution(int rotation) {
         List<Size> supportedResolution = mCameraConfig.getSupportedResolution();
         Size targetResolution = mCameraConfig.getTargetResolution(rotation);
         if (rotation == 0) {
@@ -54,11 +50,15 @@ public class CameraManager extends BaseCameraManager {
         }
         int index = supportedResolution.indexOf(targetResolution);
 
-        return mCameraConfig.setTargetResolution(supportedResolution.get((index + 1) % supportedResolution.size()));
+        if (mCameraConfig.setTargetResolution(supportedResolution.get((index + 1) % supportedResolution.size()))) {
+            cameraConfigShouldChange();
+        }
     }
 
-    public boolean changeCameraPreviewOutputScaleType() {
-        return mCameraConfig.changePreviewScaleType();
+    public void changeCameraPreviewOutputScaleType() {
+        if (mCameraConfig.changePreviewScaleType()) {
+            cameraConfigShouldChange();
+        }
     }
 
     public void capturePhoto(File targetFile) {

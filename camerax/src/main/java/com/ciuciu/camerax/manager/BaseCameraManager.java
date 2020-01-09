@@ -11,6 +11,8 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureConfig;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.ciuciu.camerax.config.CameraConfig;
 import com.ciuciu.camerax.controller.BaseControllerView;
@@ -24,6 +26,10 @@ public abstract class BaseCameraManager {
 
     protected Preview mPreview;
     protected ImageCapture mImageCapture;
+
+    protected MutableLiveData<CameraConfig> liveDataCameraConfig = new MutableLiveData<>();
+
+    protected CameraManagerListener mCameraManagerListener;
 
     private DisplayManager mDisplayManager;
     private TextureView mAttachedTextureView;
@@ -44,15 +50,8 @@ public abstract class BaseCameraManager {
         public void onDisplayChanged(int displayId) {
             if (displayId == BaseCameraManager.this.mAttachedTextureDisplayId) {
                 Log.d(TAG, "Rotation changed: " + displayId);
-                if (mPreview != null && mAttachedTextureView != null && mAttachedTextureView.getDisplay() != null) {
-                    Log.d(TAG, "Set new rotation " + mAttachedTextureView.getDisplay().getRotation() + " for Preview");
-                    mPreview.setTargetRotation(mAttachedTextureView.getDisplay().getRotation());
-                }
-
-                if (mImageCapture != null && mAttachedTextureView != null && mAttachedTextureView.getDisplay() != null) {
-                    Log.d(TAG, "Set new rotation " + mAttachedTextureView.getDisplay().getRotation() + " for ImageCapture");
-                    //mImageCapture.setTargetRotation(mAttachedTextureView.getDisplay().getRotation());
-                    generateCaptureConfig(mAttachedTextureView.getDisplay().getRotation());
+                if (mAttachedTextureView != null && mAttachedTextureView.getDisplay() != null) {
+                    cameraConfigShouldChange();
                 }
                 //imageAnalyzer?.setTargetRotation(view.display.rotation);
             }
@@ -77,7 +76,13 @@ public abstract class BaseCameraManager {
         }
     }
 
-    public abstract void setListener(CameraManagerListener listener);
+    public void setListener(CameraManagerListener listener) {
+        mCameraManagerListener = listener;
+    }
+
+    public LiveData<CameraConfig> getLiveDataCameraConfig() {
+        return liveDataCameraConfig;
+    }
 
     public CameraConfig getCameraConfig() {
         return mCameraConfig;
@@ -138,4 +143,10 @@ public abstract class BaseCameraManager {
         return mImageCapture;
     }
 
+    protected void cameraConfigShouldChange() {
+        if (mCameraManagerListener != null) {
+            mCameraManagerListener.onCameraConfigChanged();
+        }
+        liveDataCameraConfig.postValue(mCameraConfig);
+    }
 }

@@ -57,11 +57,11 @@ public class CameraConfig {
         }
     }
 
-    public CameraConfig(Context context,
-                        @Nullable CameraX.LensFacing lensFacing,
-                        @Nullable AspectRatio aspectRatio,
-                        @Nullable TargetResolution targetResolution,
-                        @Nullable PreviewScaleType previewScaleType) {
+    CameraConfig(Context context,
+                 @Nullable CameraX.LensFacing lensFacing,
+                 @Nullable AspectRatio aspectRatio,
+                 @Nullable TargetResolution targetResolution,
+                 @Nullable PreviewScaleType previewScaleType) {
 
         this.mContext = context;
         if (lensFacing != null) {
