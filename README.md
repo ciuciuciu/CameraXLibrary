@@ -1,4 +1,4 @@
-"# CameraXLibrary" 
+# CameraX library for Android
 
 ----
 ## what is CameraX?
@@ -7,18 +7,21 @@ This library's base on Android CameraX library (Jetpack support library). It hel
 
 ----
 ## Usage
+----
+### Sequence diagram
 
 ```mermaid
-graph LR
-CameraConfig-->CameraManager;
+sequenceDiagram
+    Alice->>John: Hello John, how are you?
+    John-->>Alice: Great!
 ```
-CameraConfig->CameraManager: Hello Bob, how are you?
-ControllerView->CameraManager: Hello Bob, how are you?
-ImageCapture->CameraManager: Hello Bob, how are you?
-ImageAnalyzer->CameraManager: Hello Bob, how are you?
-CameraManager->Fragment (or Activity): Hello Bob, how are you?
-Fragment(orActivity)->CameraPreview: show preview on CameraPreview
-```
+
+ControllerView-> CameraManager: Hello Bob, how are you?
+ImageCapture-> CameraManager: Hello Bob, how are you?
+ImageAnalyzer-> CameraManager: Hello Bob, how are you?
+CameraManager-> Fragment (or Activity): Hello Bob, how are you?
+Fragment (or Activity)-> CameraPreview: show preview on CameraPreview
+
 
 
 1. Write markdown text in this textarea.
