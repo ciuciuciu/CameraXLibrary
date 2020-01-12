@@ -18,3 +18,5 @@ graph TD
     ImageAnalyzer[ImageAnalyzer] -->|ImageAnalyzer| CameraManager
     CameraManager --> UI[Fragment or Activity - UI]
    UI --> |Display on TextureView| CameraPreview[CameraPreview]
+
+``![image text](https://github.com/ciuciuciu/CameraXLibrary/blob/master/diagram.png)``
