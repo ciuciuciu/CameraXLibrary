@@ -8,7 +8,10 @@ This library's base on Android CameraX library (Jetpack support library). It hel
 ----
 ## Usage
 
-```sequence
+```mermaid
+graph LR
+CameraConfig-->CameraManager;
+```
 CameraConfig->CameraManager: Hello Bob, how are you?
 ControllerView->CameraManager: Hello Bob, how are you?
 ImageCapture->CameraManager: Hello Bob, how are you?
