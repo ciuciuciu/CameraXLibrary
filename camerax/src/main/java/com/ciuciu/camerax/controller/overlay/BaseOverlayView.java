@@ -1,8 +1,10 @@
 package com.ciuciu.camerax.controller.overlay;
 
 import android.content.Context;
+import android.util.Size;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.camera.core.ImageProxy;
 
 public abstract class BaseOverlayView extends View {
@@ -68,4 +70,19 @@ public abstract class BaseOverlayView extends View {
         return null;
     }
 
+    public Frame getOutputTransformFrame(@NonNull Size imageSize) {
+        float width = getWidth();
+        float height = getHeight();
+
+        if (mInnerFrame == null || imageSize.getWidth() == 0 || imageSize.getHeight() == 0 || width == 0 || height == 0) {
+            return null;
+        }
+
+        float left = mInnerFrame.getLeft() * imageSize.getWidth() / width;
+        float right = mInnerFrame.getRight() * imageSize.getWidth() / width;
+        float top = mInnerFrame.getTop() * imageSize.getHeight() / height;
+        float bottom = mInnerFrame.getBottom() * imageSize.getHeight() / height;
+
+        return new Frame(left, right, top, bottom);
+    }
 }

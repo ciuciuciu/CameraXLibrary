@@ -1,2 +1,2 @@
-include ':app', /*':cameralibrary',*/ ':camerax'
+include ':sample', ':camerax'
 rootProject.name='CameraPreview'

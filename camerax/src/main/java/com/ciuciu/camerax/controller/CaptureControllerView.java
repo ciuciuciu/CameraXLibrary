@@ -13,7 +13,6 @@ import com.ciuciu.camerax.R;
 import com.ciuciu.camerax.config.CameraConfig;
 import com.ciuciu.camerax.config.PreviewScaleType;
 import com.ciuciu.camerax.controller.overlay.CropOverlayView;
-import com.ciuciu.camerax.controller.overlay.ScanOverlayView;
 import com.ciuciu.camerax.utils.ImageLoader;
 
 import java.io.File;
@@ -98,9 +97,9 @@ public class CaptureControllerView extends BaseControllerView {
     public void initOverlayView() {
         overlayContainer.removeAllViews();
 
-        /*mOverlayView = new CropOverlayView(getContext());
+        mOverlayView = new CropOverlayView(getContext());
         overlayContainer.addView(mOverlayView);
-        overlayContainer.setVisibility(VISIBLE);*/
+        overlayContainer.setVisibility(VISIBLE);
     }
 
     @Override
