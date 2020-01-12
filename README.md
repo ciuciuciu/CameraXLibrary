@@ -9,7 +9,10 @@ This library's base on Android CameraX library (Jetpack support library). It hel
 
 
 ## Usage
-----
+
+![image text](https://github.com/ciuciuciu/CameraXLibrary/blob/master/diagram.png)
+
+
 graph TD
     CameraConfig[CameraConfig] -->|LensFacing, AspectRatio, TargetResolution, PreviewScaleType| CameraManager[CameraManager]
     ControllerView[ControllerView] -->|Capture, Preview Overlay... | CameraManager[CameraManager]
@@ -19,4 +22,5 @@ graph TD
     CameraManager --> UI[Fragment or Activity - UI]
    UI --> |Display on TextureView| CameraPreview[CameraPreview]
 
-``![image text](https://github.com/ciuciuciu/CameraXLibrary/blob/master/diagram.png)``
+
+----
