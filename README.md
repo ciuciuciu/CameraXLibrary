@@ -10,15 +10,11 @@ This library's base on Android CameraX library (Jetpack support library). It hel
 
 ## Usage
 ----
-### Sequence diagram
-
-```mermaid
 graph TD
-    CameraConfig[CameraConfig] -->|Text| CameraManager[CameraManager]
-    ControllerView[ControllerView] -->|Text| CameraManager[CameraManager]
-    C[ImageCapture] -->|Text| CameraManager
-    D[ImageAnalyzer] -->|Text| CameraManager
-    CameraManager -->|Text| UI[Fragment or Activity - UI]
-   UI --> |Text| CameraPreview[CameraPreview]
-```
-----
+    CameraConfig[CameraConfig] -->|LensFacing, AspectRatio, TargetResolution, PreviewScaleType| CameraManager[CameraManager]
+    ControllerView[ControllerView] -->|Capture, Preview Overlay... | CameraManager[CameraManager]
+    Preview[Preview] -->|Preview| CameraManager
+    ImageCapture[ImageCapture] -->|ImageCapture| CameraManager
+    ImageAnalyzer[ImageAnalyzer] -->|ImageAnalyzer| CameraManager
+    CameraManager --> UI[Fragment or Activity - UI]
+   UI --> |Display on TextureView| CameraPreview[CameraPreview]
