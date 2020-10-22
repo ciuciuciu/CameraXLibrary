@@ -1,12 +1,7 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.2"
-
 
     defaultConfig {
         minSdkVersion 21
@@ -33,9 +28,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.core:core-ktx:1.0.2'
 
     // CameraX core library
     def camerax_version = "1.0.0-alpha06"
@@ -52,7 +45,11 @@ dependencies {
     // If you to use Camera Extensions
     //implementation "androidx.camera:camera-extensions:$camerax_ext_version"
 
+    // for mlkit
+    implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
+    // for mlkit face detection
+    implementation 'com.google.firebase:firebase-ml-vision-face-model:19.0.0'
+
     // Glide
     implementation 'com.github.bumptech.glide:glide:4.10.0'
-    kapt 'com.github.bumptech.glide:compiler:4.10.0'
 }

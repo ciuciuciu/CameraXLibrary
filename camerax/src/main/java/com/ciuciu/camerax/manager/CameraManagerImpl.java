@@ -54,8 +54,11 @@ public class CameraManagerImpl extends CameraManager {
                     Log.d(TAG, "Rotation changed: " + displayId);
                     if (mAttachedTextureView != null && mAttachedTextureView.getDisplay() != null) {
                         cameraConfigShouldChange();
+
+                        if (mImageAnalysis != null) {
+                            mImageAnalysis.setTargetRotation(mAttachedTextureView.getDisplay().getRotation());
+                        }
                     }
-                    //imageAnalyzer?.setTargetRotation(view.display.rotation);
                 }
             }
         };

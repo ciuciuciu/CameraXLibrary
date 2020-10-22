@@ -7,6 +7,7 @@ import android.view.TextureView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureConfig;
 import androidx.camera.core.Preview;
@@ -29,6 +30,8 @@ public abstract class CameraManager {
 
     protected CameraConfig mCameraConfig;
     protected BaseControllerView mControllerView;
+
+    protected ImageAnalysis mImageAnalysis;
 
     protected Executor mainExecutor;
     protected DisplayManager.DisplayListener mDisplayListener;
@@ -109,6 +112,9 @@ public abstract class CameraManager {
         return mImageCapture;
     }
 
+    public void setImageAnalysis(ImageAnalysis imageAnalysis){
+        mImageAnalysis = imageAnalysis;
+    }
 
     /**
      * Camera Config change

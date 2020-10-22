@@ -5,22 +5,29 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.camera.core.CameraX;
+import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.ImageAnalysisConfig;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.Preview;
 import androidx.fragment.app.Fragment;
 
 import com.ciuciu.camerax.CameraHelper;
 import com.ciuciu.camerax.R;
+import com.ciuciu.camerax.analyzer.MLKitFacesAnalyzer;
+import com.ciuciu.camerax.controller.BaseControllerView;
 import com.ciuciu.camerax.controller.CameraControllerListener;
 import com.ciuciu.camerax.controller.CaptureControllerView;
+import com.ciuciu.camerax.controller.overlay.BaseOverlayView;
 import com.ciuciu.camerax.manager.CameraManager;
 import com.ciuciu.camerax.manager.CameraManagerImpl;
 import com.ciuciu.camerax.manager.CameraManagerListener;
@@ -31,6 +38,8 @@ import com.ciuciu.camerax.utils.FileUtils;
 import java.io.File;
 
 public class CameraFragment extends BaseCameraFragment {
+
+    private ImageView imagePreview;
 
     private CameraPreview mCameraPreview;
     private CameraManager mCameraManager;
@@ -45,6 +54,7 @@ public class CameraFragment extends BaseCameraFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_camera_x, container, false);
+        imagePreview = rootView.findViewById(R.id.imagePreview);
         return rootView;
     }
 
@@ -80,17 +90,37 @@ public class CameraFragment extends BaseCameraFragment {
             public void run() {
                 CameraX.unbindAll();
 
+                int rotation = textureView.getDisplay().getRotation();
+                CameraX.LensFacing lens = mCameraManager.getCameraConfig().getLensFacing();
+                Size targetResolution = mCameraManager.getCameraConfig().getTargetResolution(rotation);
+
                 // generate preview config
-                Preview preview = mCameraManager.generatePreviewConfig(textureView.getDisplay().getRotation());
+                Preview preview = mCameraManager.generatePreviewConfig(rotation);
                 mCameraPreview.setPreview(preview, mCameraManager.getCameraConfig().getPreviewScaleType());
                 mCameraPreview.setOverlayView(mCameraManager.getControllerView());
 
                 // generate capture config
-                ImageCapture imageCapture = mCameraManager.generateCaptureConfig(textureView.getDisplay().getRotation());
+                ImageCapture imageCapture = mCameraManager.generateCaptureConfig(rotation);
 
+                // generate Image Analyze
+                ImageAnalysisConfig iac = new ImageAnalysisConfig
+                        .Builder()
+                        .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
+                        .setTargetResolution(targetResolution)
+                        .setLensFacing(lens)
+                        .setTargetRotation(rotation)
+                        .build();
+
+                BaseControllerView controllerView = mCameraManager.getControllerView();
+                BaseOverlayView baseOverlayView = controllerView.getOverlayView();
+
+                ImageAnalysis imageAnalysis = new ImageAnalysis(iac);
+                imageAnalysis.setAnalyzer(Runnable::run, new MLKitFacesAnalyzer(getActivity(), imagePreview, baseOverlayView));
+
+                mCameraManager.setImageAnalysis(imageAnalysis);
                 // Attach to manager and bind to lifecycle
                 mCameraManager.onAttach(mCameraPreview.getTextureView());
-                CameraX.bindToLifecycle(CameraFragment.this, preview, imageCapture);
+                CameraX.bindToLifecycle(CameraFragment.this, preview, imageCapture, imageAnalysis);
             }
         });
     }

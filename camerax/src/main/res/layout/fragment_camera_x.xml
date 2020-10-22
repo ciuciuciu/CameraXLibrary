@@ -8,4 +8,10 @@
         android:id="@+id/cameraPreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/imagePreview"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:scaleType="centerInside" />
 </RelativeLayout>
