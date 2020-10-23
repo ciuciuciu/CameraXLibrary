@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageAnalysisConfig;
@@ -93,6 +94,7 @@ public class CameraFragment extends BaseCameraFragment {
                 int rotation = textureView.getDisplay().getRotation();
                 CameraX.LensFacing lens = mCameraManager.getCameraConfig().getLensFacing();
                 Size targetResolution = mCameraManager.getCameraConfig().getTargetResolution(rotation);
+                AspectRatio aspectRatio = mCameraManager.getCameraConfig().getAspectRatio();
 
                 // generate preview config
                 Preview preview = mCameraManager.generatePreviewConfig(rotation);
@@ -106,7 +108,8 @@ public class CameraFragment extends BaseCameraFragment {
                 ImageAnalysisConfig iac = new ImageAnalysisConfig
                         .Builder()
                         .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
-                        .setTargetResolution(targetResolution)
+                        //.setTargetResolution(new Size(1280, 720))
+                        .setTargetAspectRatio(aspectRatio)
                         .setLensFacing(lens)
                         .setTargetRotation(rotation)
                         .build();
@@ -117,7 +120,8 @@ public class CameraFragment extends BaseCameraFragment {
                 ImageAnalysis imageAnalysis = new ImageAnalysis(iac);
                 imageAnalysis.setAnalyzer(Runnable::run, new MLKitFacesAnalyzer(getActivity(), imagePreview, baseOverlayView));
 
-                mCameraManager.setImageAnalysis(imageAnalysis);
+                //mCameraManager.setImageAnalysis(imageAnalysis);
+
                 // Attach to manager and bind to lifecycle
                 mCameraManager.onAttach(mCameraPreview.getTextureView());
                 CameraX.bindToLifecycle(CameraFragment.this, preview, imageCapture, imageAnalysis);

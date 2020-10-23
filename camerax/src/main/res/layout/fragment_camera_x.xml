@@ -11,7 +11,8 @@
 
     <ImageView
         android:id="@+id/imagePreview"
-        android:layout_width="400dp"
-        android:layout_height="400dp"
-        android:scaleType="centerInside" />
+        android:background="#80FF0000"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:scaleType="fitCenter" />
 </RelativeLayout>
