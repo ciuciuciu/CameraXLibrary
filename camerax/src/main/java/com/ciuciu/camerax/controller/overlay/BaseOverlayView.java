@@ -85,4 +85,20 @@ public abstract class BaseOverlayView extends View {
 
         return new Frame(left, right, top, bottom);
     }
+
+    public float getRelativePosX() {
+        return mInnerFrame.getLeft() / getWidth();
+    }
+
+    public float getRelativePosY() {
+        return mInnerFrame.getTop() / getHeight();
+    }
+
+    public float getRelativePosWidth() {
+        return (mInnerFrame.getRight() - mInnerFrame.getLeft()) / getWidth();
+    }
+
+    public float getRelativePosHeight() {
+        return (mInnerFrame.getBottom() - mInnerFrame.getTop()) / getHeight();
+    }
 }
