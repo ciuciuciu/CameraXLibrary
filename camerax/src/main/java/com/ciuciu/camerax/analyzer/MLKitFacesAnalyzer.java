@@ -2,6 +2,7 @@ package com.ciuciu.camerax.analyzer;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.util.Log;
 import android.util.Size;
 import android.widget.ImageView;
@@ -29,6 +30,7 @@ public class MLKitFacesAnalyzer implements ImageAnalysis.Analyzer {
     Activity activity;
     ImageView preview;
     BaseOverlayView mCropFrame;
+    Bitmap croppedBmp;
 
     public MLKitFacesAnalyzer(Activity activity, ImageView preview, BaseOverlayView cropFrame) {
         this.activity = activity;
@@ -37,27 +39,31 @@ public class MLKitFacesAnalyzer implements ImageAnalysis.Analyzer {
     }
 
     @Override
-    public void analyze(ImageProxy image, int rotationDegrees) {
-        if (image == null || image.getImage() == null) {
+    public void analyze(ImageProxy imageProxy, int rotationDegrees) {
+        if (imageProxy == null || imageProxy.getImage() == null) {
             return;
         }
+        Image image = imageProxy.getImage();
 
         int rotation = degreesToFirebaseRotation(rotationDegrees);
-        firebaseVisionImage = FirebaseVisionImage.fromMediaImage(image.getImage(), rotation);
 
+        firebaseVisionImage = FirebaseVisionImage.fromMediaImage(image, rotation);
         // Crop Bitmap here
         try {
-            Frame transformFrame = mCropFrame.getOutputTransformFrame(new Size(firebaseVisionImage.getBitmap().getWidth(), firebaseVisionImage.getBitmap().getHeight()));
+            Frame transformFrame = mCropFrame.getOutputTransformFrame(new Size(image.getWidth(), image.getHeight()));
             if (transformFrame != null && transformFrame.toRect() != null) {
+                image.setCropRect(transformFrame.toRect());
 
-                Bitmap croppedBmp = Bitmap.createBitmap(firebaseVisionImage.getBitmap(),
+                if (croppedBmp != null) {
+                    croppedBmp.recycle();
+                }
+                croppedBmp = Bitmap.createBitmap(firebaseVisionImage.getBitmap(),
                         (int) transformFrame.getLeft(),
                         (int) transformFrame.getTop(),
                         (int) transformFrame.getWidth(),
                         (int) transformFrame.getHeight());
 
-                //activity.runOnUiThread(() -> preview.setImageBitmap(croppedBmp));
-
+                activity.runOnUiThread(() -> preview.setImageBitmap(croppedBmp));
 
                 // Init Face-Detector
                 FirebaseVisionFaceDetectorOptions detectorOptions = new FirebaseVisionFaceDetectorOptions.Builder()
