@@ -47,24 +47,31 @@ public abstract class BaseOverlayView extends View {
         switch (rotationDegrees) {
             case 0:
             case 180:
-                return new Frame(dLeft * imageWidth,
-                        dRight * imageWidth,
-                        dTop * imageHeight,
-                        dBottom * imageHeight);
+                return new Frame.Builder()
+                        .widthSize(imageWidth, imageHeight)
+                        .fromPosition(dLeft * imageWidth,
+                                dRight * imageWidth,
+                                dTop * imageHeight,
+                                dBottom * imageHeight)
+                        .build();
 
             case 90:
-                return new Frame(
-                        dTop * imageWidth,
-                        dBottom * imageWidth,
-                        dLeft * imageHeight,
-                        dRight * imageHeight);
+                return new Frame.Builder()
+                        .widthSize(imageWidth, imageHeight)
+                        .fromPosition(dTop * imageWidth,
+                                dBottom * imageWidth,
+                                dLeft * imageHeight,
+                                dRight * imageHeight)
+                        .build();
 
             case 270:
-                return new Frame(
-                        (1f - dBottom) * imageWidth,
-                        dTop * imageWidth,
-                        dLeft * imageHeight,
-                        dRight * imageHeight);
+                return new Frame.Builder()
+                        .widthSize(imageWidth, imageHeight)
+                        .fromPosition((1f - dBottom) * imageWidth,
+                                dTop * imageWidth,
+                                dLeft * imageHeight,
+                                dRight * imageHeight)
+                        .build();
         }
 
         return null;
@@ -83,7 +90,10 @@ public abstract class BaseOverlayView extends View {
         float top = mInnerFrame.getTop() * imageSize.getHeight() / height;
         float bottom = mInnerFrame.getBottom() * imageSize.getHeight() / height;
 
-        return new Frame(left, right, top, bottom);
+        return new Frame.Builder()
+                .widthSize(width, height)
+                .fromPosition(left, right, top, bottom)
+                .build();
     }
 
     public float getRelativePosX() {

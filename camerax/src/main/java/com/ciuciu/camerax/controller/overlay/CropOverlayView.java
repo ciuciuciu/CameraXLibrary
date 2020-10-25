@@ -40,14 +40,15 @@ public class CropOverlayView extends BaseOverlayView {
 
     @Override
     public void createFrame(int width, int height) {
-        float size = Math.min(width * 0.8f, height * 0.8f);
-        float left = (width - size) / 2f;
-        float right = size + left;
-        float top = (height - size) / 2f;
-        float bottom = top + size;
+        mOuterFrame = new Frame.Builder()
+                .widthSize(width, height)
+                .fromRelative(0.1f, 0.15f, 0.8f, 0.7f)
+                .build();
 
-        mOuterFrame = new Frame(left, right, top, bottom);
-        mInnerFrame = new Frame(left, right, top, bottom);
+        mInnerFrame = new Frame.Builder()
+                .widthSize(width, height)
+                .fromRelative(0.1f, 0.15f, 0.8f, 0.7f)
+                .build();
 
         borderEdgeSize = (int) mOuterFrame.getHeight() / 6;
     }
