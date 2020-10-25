@@ -11,7 +11,7 @@
 
     <ImageView
         android:id="@+id/imagePreview"
-        android:background="#80FF0000"
+        android:background="#80FFFFFF"
         android:layout_width="240dp"
         android:layout_height="240dp"
         android:scaleType="fitCenter" />

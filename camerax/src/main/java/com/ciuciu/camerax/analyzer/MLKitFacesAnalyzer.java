@@ -1,13 +1,12 @@
 package com.ciuciu.camerax.analyzer;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.media.Image;
 import android.util.Log;
 import android.util.Size;
-import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 
@@ -16,6 +15,8 @@ import com.ciuciu.camerax.controller.overlay.Frame;
 import com.ciuciu.camerax.utils.BitmapUtils;
 import com.ciuciu.camerax.utils.FrameMetadata;
 import com.ciuciu.camerax.utils.ImageUtil;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
@@ -28,18 +29,23 @@ import java.util.List;
 public class MLKitFacesAnalyzer implements ImageAnalysis.Analyzer {
     private static String TAG = "MLKitFacesAnalyzer";
 
+    private BaseOverlayView mOverlayView;
+    private FaceDetectionListener mCallback;
+
     private FirebaseVisionFaceDetector faceDetector;
     private FirebaseVisionImage firebaseVisionImage;
+    private Bitmap croppedBmp;
 
-    Activity activity;
-    ImageView preview;
-    BaseOverlayView mCropFrame;
-    Bitmap croppedBmp;
+    public MLKitFacesAnalyzer(BaseOverlayView overlayView, FaceDetectionListener callback) {
+        this.mOverlayView = overlayView;
+        this.mCallback = callback;
 
-    public MLKitFacesAnalyzer(Activity activity, ImageView preview, BaseOverlayView cropFrame) {
-        this.activity = activity;
-        this.preview = preview;
-        this.mCropFrame = cropFrame;
+        FirebaseVisionFaceDetectorOptions detectorOptions = new FirebaseVisionFaceDetectorOptions.Builder()
+                .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
+                .build();
+        faceDetector = FirebaseVision
+                .getInstance()
+                .getVisionFaceDetector(detectorOptions);
     }
 
     @Override
@@ -47,7 +53,8 @@ public class MLKitFacesAnalyzer implements ImageAnalysis.Analyzer {
         if (imageProxy == null || imageProxy.getImage() == null) {
             return;
         }
-        Log.i(TAG, "--------------------------------------- ");
+
+        Log.i(TAG, "=============================================");
         Log.i(TAG, "start analyze ");
 
         analyzeWithoutCrop(imageProxy, rotationDegrees);
@@ -57,34 +64,38 @@ public class MLKitFacesAnalyzer implements ImageAnalysis.Analyzer {
         //analyzeWithCropRGBFormat(imageProxy, rotationDegrees);
     }
 
-    private void processFaces(List<FirebaseVisionFace> faces) {
-        Log.i(TAG, "processFaces " + faces.size());
-        Log.i(TAG, "=============================================");
-    }
+    OnSuccessListener mOnFaceDetectSuccess = new OnSuccessListener<List<FirebaseVisionFace>>() {
 
-    private void analyzeWithoutCrop(ImageProxy imageProxy, int rotationDegrees){
+        @Override
+        public void onSuccess(List<FirebaseVisionFace> firebaseVisionFaces) {
+            if (mCallback != null) {
+                mCallback.onFaceDetectionSuccess(firebaseVisionImage, firebaseVisionFaces);
+            }
+        }
+    };
+
+    OnFailureListener mOnFaceDetectFailed = new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception ex) {
+            ex.printStackTrace();
+            if (mCallback != null) {
+                mCallback.onFaceDetectionFailed();
+            }
+        }
+    };
+
+    private void analyzeWithoutCrop(ImageProxy imageProxy, int rotationDegrees) {
         Image image = imageProxy.getImage();
         int rotation = degreesToFirebaseRotation(rotationDegrees);
         firebaseVisionImage = FirebaseVisionImage.fromMediaImage(image, rotation);
 
-        //activity.runOnUiThread(() -> preview.setImageBitmap(firebaseVisionImage.getBitmap()));
-
-        // Init Face-Detector
-        FirebaseVisionFaceDetectorOptions detectorOptions = new FirebaseVisionFaceDetectorOptions.Builder()
-                .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
-                .build();
-        faceDetector = FirebaseVision
-                .getInstance()
-                .getVisionFaceDetector(detectorOptions);
         // Detect Faces
         faceDetector
                 .detectInImage(firebaseVisionImage)
-                .addOnSuccessListener(firebaseVisionFaces -> {
-                    if (!firebaseVisionFaces.isEmpty()) {
-                        processFaces(firebaseVisionFaces);
-                    }
-                }).addOnFailureListener(e -> Log.i(TAG, e.toString()));
+                .addOnSuccessListener(mOnFaceDetectSuccess)
+                .addOnFailureListener(mOnFaceDetectFailed);
     }
+
     private void analyzeWithCropYUVFormat(ImageProxy imageProxy, int rotationDegrees) {
         try {
             Image image = imageProxy.getImage();
@@ -95,23 +106,11 @@ public class MLKitFacesAnalyzer implements ImageAnalysis.Analyzer {
             byte[] byteArray = ImageUtil.YUV420toNV21(image);
             Bitmap cropBitmap = BitmapUtils.getBitmap(byteArray, new FrameMetadata(cropRect.width(), cropRect.height(), rotationDegrees));
 
-            activity.runOnUiThread(() -> preview.setImageBitmap(cropBitmap));
-
-            // Init Face-Detector
-            FirebaseVisionFaceDetectorOptions detectorOptions = new FirebaseVisionFaceDetectorOptions.Builder()
-                    .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
-                    .build();
-            faceDetector = FirebaseVision
-                    .getInstance()
-                    .getVisionFaceDetector(detectorOptions);
             // Detect Faces
             faceDetector
                     .detectInImage(FirebaseVisionImage.fromBitmap(cropBitmap))
-                    .addOnSuccessListener(firebaseVisionFaces -> {
-                        if (!firebaseVisionFaces.isEmpty()) {
-                            processFaces(firebaseVisionFaces);
-                        }
-                    }).addOnFailureListener(e -> Log.i(TAG, e.toString()));
+                    .addOnSuccessListener(mOnFaceDetectSuccess)
+                    .addOnFailureListener(mOnFaceDetectFailed);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -123,7 +122,7 @@ public class MLKitFacesAnalyzer implements ImageAnalysis.Analyzer {
         firebaseVisionImage = FirebaseVisionImage.fromMediaImage(image, rotation);
         // Crop Bitmap here
         try {
-            Frame transformFrame = mCropFrame.getOutputTransformFrame(new Size(image.getWidth(), image.getHeight()));
+            Frame transformFrame = mOverlayView.getOutputTransformFrame(new Size(image.getWidth(), image.getHeight()));
             if (transformFrame != null && transformFrame.toRect() != null) {
                 image.setCropRect(transformFrame.toRect());
 
@@ -136,23 +135,11 @@ public class MLKitFacesAnalyzer implements ImageAnalysis.Analyzer {
                         (int) transformFrame.getWidth(),
                         (int) transformFrame.getHeight());
 
-                activity.runOnUiThread(() -> preview.setImageBitmap(croppedBmp));
-
-                // Init Face-Detector
-                FirebaseVisionFaceDetectorOptions detectorOptions = new FirebaseVisionFaceDetectorOptions.Builder()
-                        .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
-                        .build();
-                faceDetector = FirebaseVision
-                        .getInstance()
-                        .getVisionFaceDetector(detectorOptions);
                 // Detect Faces
                 faceDetector
                         .detectInImage(FirebaseVisionImage.fromBitmap(croppedBmp))
-                        .addOnSuccessListener(firebaseVisionFaces -> {
-                            if (!firebaseVisionFaces.isEmpty()) {
-                                processFaces(firebaseVisionFaces);
-                            }
-                        }).addOnFailureListener(e -> Log.i(TAG, e.toString()));
+                        .addOnSuccessListener(mOnFaceDetectSuccess)
+                        .addOnFailureListener(mOnFaceDetectFailed);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -167,31 +154,31 @@ public class MLKitFacesAnalyzer implements ImageAnalysis.Analyzer {
 
         switch (rotation) {
             case 0:
-                startX = (int) (mCropFrame.getRelativePosX() * image.getWidth());
-                numberPixelW = (int) (mCropFrame.getRelativePosWidth() * image.getWidth());
-                startY = (int) (mCropFrame.getRelativePosY() * image.getHeight());
-                numberPixelH = (int) (mCropFrame.getRelativePosHeight() * image.getHeight());
+                startX = (int) (mOverlayView.getRelativePosX() * image.getWidth());
+                numberPixelW = (int) (mOverlayView.getRelativePosWidth() * image.getWidth());
+                startY = (int) (mOverlayView.getRelativePosY() * image.getHeight());
+                numberPixelH = (int) (mOverlayView.getRelativePosHeight() * image.getHeight());
                 return new Rect(startX, startY, startX + numberPixelW, startY + numberPixelH);
 
             case 90:
-                startX = (int) (mCropFrame.getRelativePosY() * image.getWidth());
-                numberPixelW = (int) (mCropFrame.getRelativePosHeight() * image.getWidth());
-                numberPixelH = (int) (mCropFrame.getRelativePosWidth() * image.getHeight());
-                startY = (int) (image.getHeight() - (mCropFrame.getRelativePosX() * image.getHeight()) - numberPixelH);
+                startX = (int) (mOverlayView.getRelativePosY() * image.getWidth());
+                numberPixelW = (int) (mOverlayView.getRelativePosHeight() * image.getWidth());
+                numberPixelH = (int) (mOverlayView.getRelativePosWidth() * image.getHeight());
+                startY = (int) (image.getHeight() - (mOverlayView.getRelativePosX() * image.getHeight()) - numberPixelH);
                 return new Rect(startX, startY, startX + numberPixelW, startY + numberPixelH);
 
             case 180:
-                numberPixelW = (int) (mCropFrame.getRelativePosWidth() * image.getWidth());
-                startX = (int) (image.getWidth() - mCropFrame.getRelativePosX() * image.getWidth() - numberPixelW);
-                numberPixelH = (int) (mCropFrame.getRelativePosHeight() * image.getHeight());
-                startY = (int) (image.getHeight() - mCropFrame.getRelativePosY() * image.getHeight() - numberPixelH);
+                numberPixelW = (int) (mOverlayView.getRelativePosWidth() * image.getWidth());
+                startX = (int) (image.getWidth() - mOverlayView.getRelativePosX() * image.getWidth() - numberPixelW);
+                numberPixelH = (int) (mOverlayView.getRelativePosHeight() * image.getHeight());
+                startY = (int) (image.getHeight() - mOverlayView.getRelativePosY() * image.getHeight() - numberPixelH);
                 return new Rect(startX, startY, startX + numberPixelW, startY + numberPixelH);
 
             case 270:
-                numberPixelW = (int) (mCropFrame.getRelativePosHeight() * image.getWidth());
-                numberPixelH = (int) (mCropFrame.getRelativePosWidth() * image.getHeight());
-                startX = (int) (image.getWidth() - mCropFrame.getRelativePosY() * image.getWidth() - numberPixelW);
-                startY = (int) (mCropFrame.getRelativePosX() * image.getHeight());
+                numberPixelW = (int) (mOverlayView.getRelativePosHeight() * image.getWidth());
+                numberPixelH = (int) (mOverlayView.getRelativePosWidth() * image.getHeight());
+                startX = (int) (image.getWidth() - mOverlayView.getRelativePosY() * image.getWidth() - numberPixelW);
+                startY = (int) (mOverlayView.getRelativePosX() * image.getHeight());
                 return new Rect(startX, startY, startX + numberPixelW, startY + numberPixelH);
 
             default:

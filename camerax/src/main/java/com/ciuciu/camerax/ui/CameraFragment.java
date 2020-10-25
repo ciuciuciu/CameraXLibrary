@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.ciuciu.camerax.CameraHelper;
 import com.ciuciu.camerax.R;
+import com.ciuciu.camerax.analyzer.FaceDetectionListener;
 import com.ciuciu.camerax.analyzer.MLKitFacesAnalyzer;
 import com.ciuciu.camerax.controller.BaseControllerView;
 import com.ciuciu.camerax.controller.CameraControllerListener;
@@ -35,8 +36,11 @@ import com.ciuciu.camerax.manager.CameraManagerListener;
 import com.ciuciu.camerax.preview.CameraPreview;
 import com.ciuciu.camerax.ui.viewer.PhotoViewerActivity;
 import com.ciuciu.camerax.utils.FileUtils;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 
 import java.io.File;
+import java.util.List;
 
 public class CameraFragment extends BaseCameraFragment {
 
@@ -118,9 +122,9 @@ public class CameraFragment extends BaseCameraFragment {
                 BaseOverlayView baseOverlayView = controllerView.getOverlayView();
 
                 ImageAnalysis imageAnalysis = new ImageAnalysis(iac);
-                imageAnalysis.setAnalyzer(Runnable::run, new MLKitFacesAnalyzer(getActivity(), imagePreview, baseOverlayView));
+                imageAnalysis.setAnalyzer(Runnable::run, new MLKitFacesAnalyzer(baseOverlayView, mFaceDetectionListener));
 
-                //mCameraManager.setImageAnalysis(imageAnalysis);
+                mCameraManager.setImageAnalysis(imageAnalysis);
 
                 // Attach to manager and bind to lifecycle
                 mCameraManager.onAttach(mCameraPreview.getTextureView());
@@ -200,5 +204,21 @@ public class CameraFragment extends BaseCameraFragment {
         }
     };
 
+    FaceDetectionListener mFaceDetectionListener = new FaceDetectionListener() {
+
+        @Override
+        public void onFaceDetectionSuccess(FirebaseVisionImage firebaseVisionImage, List<FirebaseVisionFace> faces) {
+            if(faces.isEmpty()){
+                imagePreview.setImageBitmap(null);
+            }else {
+                imagePreview.setImageBitmap(firebaseVisionImage.getBitmap());
+            }
+        }
+
+        @Override
+        public void onFaceDetectionFailed() {
+            imagePreview.setImageBitmap(null);
+        }
+    };
 
 }
